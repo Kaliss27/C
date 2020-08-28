@@ -59,10 +59,12 @@ int main(int argc, char const *argv[])
 
 			break;
 		}
+		system("clear");
 		printf("Lista de Listas\n");
 		ver_listas(inicio_l);
 		printf("1->Continuar\n2->Stop\t:");
 		scanf("%i",&bnd);
+		system("clear");
 	}while(bnd==1);
 	ver_listas(inicio_l);	
 	return 0;
@@ -115,8 +117,11 @@ int crear_lista(e_lista1 **inicio,int idl){
 	}
 }
 void menu(){
-	printf("===MENU DE OPCIONES===\n1->Insertar nuevo elemento a una lista\n2->Crear nueva lista\n3->Eliminar elemento de una lista\n4->Eliminar lista\n5->Ver lista\n:");
+	printf("===MENU DE OPCIONES===\n1->Insertar nuevo elemento a una lista\n2->Crear nueva lista\n");
+	printf("3->Eliminar elemento de una lista\n4->Eliminar lista\n6->Eliminar lista de listas:\n");
+	printf("Opcion:");
 }
+
 int insertar_elemento_ent(e_lista **inicio,int d)
 {
 	e_lista *newe=(e_lista*)malloc(sizeof(e_lista));
@@ -134,7 +139,8 @@ int insertar_elemento_lista(e_lista1 **inicio,int idl,int num){
 		return 1;
 	}
 }
-/*Imprimir lista de listas*/
+/*IMPRIMIR LISTA DE LISTAS*/
+//IMPRIME ELEMENTOS DE UNA LISTA 
 void ver_elementos(e_lista *inicio)
 {
 	if(inicio)
@@ -145,7 +151,7 @@ void ver_elementos(e_lista *inicio)
 		return;
 	}
 }
-
+//IMPRIME ELEMENTOS DE LA LISTA PRINCIPAL
 void ver_listas(e_lista1 *inicio)
 {
 	if(inicio)
@@ -158,6 +164,8 @@ void ver_listas(e_lista1 *inicio)
 		return;
 	}
 }
+/*-------------------------------------------------------*/
+/*ELIMINAR ELEMENTOS DE LISTAS*/
 int eliminar_elemento_l(e_lista **inicio_l, int d,int bnd){
 
 	if((*inicio_l) == NULL){

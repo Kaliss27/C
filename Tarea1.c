@@ -21,11 +21,12 @@ int insertar_elemento_ent(e_lista **inicio,int d);
 int insertar_elemento_lista(e_lista1 **inicio,int idl,int num);
 void ver_listas(e_lista1 *inicio);
 void ver_elementos(e_lista *inicio);
-int eliminar_elemento_l(e_lista1 **inicio,int d,int bnd);
 int crear_lista(e_lista1 **inicio,int idl);
 void lista_ejm(e_lista1 **inicio,int bnd);
 void menu();
 int num_listas(e_lista1 *inicio,int cl);
+int eliminar_elemento_l(e_lista **inicio_l, int d,int bnd);
+void eliminar_elemento_de_lista(e_lista1 **lista,int nl,int eb);
 
 int main(int argc, char const *argv[])
 {
@@ -46,6 +47,16 @@ int main(int argc, char const *argv[])
 			break;
 			case 2:
 			crear_lista(&inicio_l,num_listas(inicio_l,1));
+			break;
+			case 3:
+			printf("Ingrese el numero de la lista a usar:\n");
+			scanf("%i",&dd);
+			printf("Ingrese un numero a almacenar:\n");
+			scanf("%i",&d);
+			eliminar_elemento_de_lista(&inicio_l,dd,d);
+			break;
+			case 4:
+
 			break;
 		}
 		printf("Lista de Listas\n");
@@ -104,7 +115,7 @@ int crear_lista(e_lista1 **inicio,int idl){
 	}
 }
 void menu(){
-	printf("===MENU DE OPCIONES===\n1->Insertar nuevo elemento a una lista\n2->Crear nueva lista\n3->Eliminar elemento de una lista\n4->Ver lista\n:");
+	printf("===MENU DE OPCIONES===\n1->Insertar nuevo elemento a una lista\n2->Crear nueva lista\n3->Eliminar elemento de una lista\n4->Eliminar lista\n5->Ver lista\n:");
 }
 int insertar_elemento_ent(e_lista **inicio,int d)
 {
@@ -147,8 +158,7 @@ void ver_listas(e_lista1 *inicio)
 		return;
 	}
 }
-//------------------
-/*int eliminar_elemento_l(e_lista1 **inicio_l, int d,int bnd){
+int eliminar_elemento_l(e_lista **inicio_l, int d,int bnd){
 
 	if((*inicio_l) == NULL){
 		if(bnd==0)
@@ -156,14 +166,21 @@ void ver_listas(e_lista1 *inicio)
 		return 1;
 	}
 	if ((*inicio_l)->dato == d){
-		e_lista1 *aux = (*inicio_l);
+		e_lista *aux = (*inicio_l);
 		(*inicio_l) = (*inicio_l)->sig;
 		free(aux); 
 		bnd=1;
 		if((*inicio_l) == NULL){
 			return 1;
 		}
-    //return eliminar_elemento_l(&(*inicio_l)->sig,d,bnd);
+    return eliminar_elemento_l(&(*inicio_l)->sig,d,bnd);
 }
 return eliminar_elemento_l(&(*inicio_l)->sig,d,bnd);
-}*/
+}
+void eliminar_elemento_de_lista(e_lista1 **lista,int nl,int eb){
+	if((*lista)){
+		e_lista1 *g_lista=buscar_lista((*lista),nl);
+		eliminar_elemento_l(&g_lista->lista_datos,eb,0);
+		return;
+	}
+}

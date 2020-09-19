@@ -13,6 +13,18 @@ typedef struct pila{              /*ELEMENTO PILA*/
 	int dato;
 	struct pila *sig;
 }e_Pila;
+
+typedef struct elemento_cola
+{
+	int dato;                        /*ELEMENTO COLA*/
+	struct elemento_cola *sig;
+}e_Cola;
+
+typedef struct Cola
+{
+	e_Cola *frente;                  /*COLA*/
+	e_Cola *final;
+}p_Cola;
 /*
   FUNCIONES PARA LISTAS, PILAS Y COLAS
 */
@@ -23,7 +35,7 @@ int agregar_inicio(e_lista1 **inicio,int num)
 	if(!newe)
 		return 0;
 	newe->dato=num;
-    newe->sig=(*inicio);
+        newe->sig=(*inicio);
 	(*inicio)=newe;
 	return 1;
 }
@@ -96,6 +108,53 @@ void ver_pila(e_Pila *tope)
 	{
 		printf("%i\n",tope->dato);
 		ver_pila(tope->sig);
+	}
+	return;
+}
+//FUNCIONES COLAS SIMPLES
+int insertar_elemento(p_Cola **cola,int d)
+{
+	e_Cola *newe=crear_elemento();
+	newe->dato=d;
+	newe->sig=NULL;
+	if(cola_vacia((*cola))==1)
+	{
+		(*cola)->frente=newe;
+		(*cola)->final=newe;
+		return 1;
+	}else
+	{
+		(*cola)->final->sig=newe;
+		(*cola)->final=newe;
+		return 1;
+	}
+}
+
+e_Cola *crear_elemento()
+{
+	e_Cola *newe=(e_Cola*)malloc(sizeof(e_Cola));
+	if(!newe)
+		return NULL;
+	return newe;
+}
+int cola_vacia(p_Cola *cola)
+{
+	if(!(cola->frente) && !(cola->final))
+		return 1;
+	return 0;
+}
+void crear_cola(p_Cola **cola)
+{
+	(*cola)->frente=NULL;
+	(*cola)->final=NULL;
+	return;
+}
+void ver_cola(e_Cola *cola)
+{
+	if(cola)
+	{
+		printf("|%i|",cola->dato);
+		ver_cola(cola->sig);
 	}
 	return;
 }

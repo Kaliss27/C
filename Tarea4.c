@@ -1,6 +1,10 @@
-//Tarea 4 Peralta Luna Karen Lisseth
+/*Tarea 4
+  Peralta Luna Karen Lisseth
+  S17002346
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 typedef struct nodoBinario
 {
@@ -21,37 +25,36 @@ int main(int argc, char const *argv[])
 	nodoB *raiz=NULL;
 	int d,opc,n;
 	do{
-		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Buscar dato en el arbol\n5->Salir\nOpci%cn:",162);
+		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Buscar dato en el arbol\n5->Salir\nOpcion:");
 		scanf("%i",&opc);
 		switch(opc){
 			case 1: 
-			printf("Ingresar un n%cmero entero:",163);
+			printf("Ingresar un numero entero:");
 			scanf("%i",&d);
 			insertar(&raiz,d);
 			break;
 			case 2:
 			printf("==Arbol binario==\n");
 			ver_Arbol(raiz,0,0);
-			system("pause");
+			sleep(5);
 			break;
 			case 3:
 			printf("==Arbol binario==\n");
             ver_Arbol(raiz,0,0);
-			printf("Ingresar un n%cmero entero:",163);
+			printf("Ingresar un numero entero:");
 			scanf("%i",&d);
 			borrar_dato(&raiz,d);
 			break;
 			case 4:
-			printf("Ingrese un n%cmero entero a buscar:",163);
+			printf("Ingrese un numero entero a buscar:");
 			scanf("%i",&d);
 			n=buscar_dato(raiz,d);
 			if(n==1)
-				printf("Se encontr%c el valor en el arbol\n",162);
+				printf("Se encontro el valor en el arbol\n");
 			if(n==0)
-				printf("No se encontr%c el valor en el arbol\n",162);
-			system("pause");
+				printf("No se encontro el valor en el arbol\n");
 		}	
-	system("cls");
+		system("clear");
 	}while(opc!=5);
 	return 0;
 }

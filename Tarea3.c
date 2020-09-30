@@ -39,8 +39,8 @@ int main(int argc, char const *argv[])
 	insertar_nuevo_nodo(&raiz,72,67);
 	insertar_nuevo_nodo(&raiz,73,68);
 	insertar_nuevo_nodo(&raiz,74,70);
-	//insertar_nuevo_nodo(&raiz,75,70);
-	//insertar_nuevo_nodo(&raiz,76,72);
+	insertar_nuevo_nodo(&raiz,75,70);
+	insertar_nuevo_nodo(&raiz,76,72);
 	imprimir_arbol(raiz);
 	return 0;
 }
@@ -83,15 +83,28 @@ int insertar_nuevo_nodo(n_padre **raiz,int d,int p)
 		(*raiz)->final=aux_h;
 		return 1;
 	}
-	printf("no father\n");
+	//printf("no father\n");
 	hijo *aux=(*raiz)->frente;
 	if(!aux)
 	{
 		return 0;
 	}else{
-		insertar_nuevo_nodo(&aux->hermano->raiz,d,p);
+		insertar_nuevo_nodo(&aux->raiz,d,p);
+		if(aux->hermano)
+		{
+			insertar_nuevo_nodo(&aux->hermano->raiz,d,p);
+			return 0;
+		}
+		//insertar_nuevo_nodo(&aux->hermano->raiz,d,p);
+		//insertar_nuevo_nodo(&aux->raiz,d,p);
+		return 0;
 	}
-	printf("aux 1\n");
+	if(aux->hermano)
+		{
+			insertar_nuevo_nodo(&aux->hermano->raiz,d,p);
+			return 0;
+		}
+	//printf("aux 1\n");
 	insertar_nuevo_nodo(&aux->raiz,d,p);
 }
 void imprimir_hojas(hijo *frente)
@@ -114,4 +127,3 @@ void imprimir_arbol(n_padre *raiz)
 	}
 	return;
 }
-

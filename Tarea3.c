@@ -30,16 +30,17 @@ int main(int argc, char const *argv[])
 	n_padre *raiz=NULL;
 	insertar_nuevo_nodo(&raiz,65,0);
 	printf("%c\n",raiz->dato);
-	//printf("insertar_nuevo_nodo\n");
 	insertar_nuevo_nodo(&raiz,66,65);
-	//printf("desp\n");
-	imprimir_arbol(raiz);
-	printf("antes de c\n");
 	insertar_nuevo_nodo(&raiz,67,65);
-	printf("after c\n");
-	imprimir_arbol(raiz);
-	insertar_nuevo_nodo(&raiz,67,66);
-	printf("after b father\n");
+	insertar_nuevo_nodo(&raiz,68,66);
+	insertar_nuevo_nodo(&raiz,69,66);
+	insertar_nuevo_nodo(&raiz,70,66);
+	insertar_nuevo_nodo(&raiz,71,67);
+	insertar_nuevo_nodo(&raiz,72,67);
+	insertar_nuevo_nodo(&raiz,73,68);
+	insertar_nuevo_nodo(&raiz,74,70);
+	//insertar_nuevo_nodo(&raiz,75,70);
+	//insertar_nuevo_nodo(&raiz,76,72);
 	imprimir_arbol(raiz);
 	return 0;
 }
@@ -84,6 +85,13 @@ int insertar_nuevo_nodo(n_padre **raiz,int d,int p)
 	}
 	printf("no father\n");
 	hijo *aux=(*raiz)->frente;
+	if(!aux)
+	{
+		return 0;
+	}else{
+		insertar_nuevo_nodo(&aux->hermano->raiz,d,p);
+	}
+	printf("aux 1\n");
 	insertar_nuevo_nodo(&aux->raiz,d,p);
 }
 void imprimir_hojas(hijo *frente)
@@ -91,7 +99,7 @@ void imprimir_hojas(hijo *frente)
 	if(frente)
 	{
 		imprimir_arbol(frente->raiz);
-		printf("%c\n",frente->raiz->dato);
+		//printf("hijo: %c\n",frente->raiz->dato);
 		imprimir_hojas(frente->hermano);
 	}
 	return;
@@ -99,12 +107,11 @@ void imprimir_hojas(hijo *frente)
 }
 void imprimir_arbol(n_padre *raiz)
 {
-	//printf("iarbol\n");
 	if(raiz)
 	{
-		//printf("Padre %p\n Hijo:%p\n",raiz,raiz->hijos);
 		printf("Padre:%c\n",raiz->dato);
 		imprimir_hojas(raiz->frente);
 	}
 	return;
 }
+

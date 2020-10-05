@@ -37,10 +37,10 @@ int main(int argc, char const *argv[])
 	insertar_nuevo_nodo(&raiz,68,66);//D
 	insertar_nuevo_nodo(&raiz,69,66);//E
 	insertar_nuevo_nodo(&raiz,70,66);//F
-	insertar_nuevo_nodo(&raiz,71,67);//H
+	insertar_nuevo_nodo(&raiz,71,67);//G
 	insertar_nuevo_nodo(&raiz,72,67);//H
 	insertar_nuevo_nodo(&raiz,73,68);//I
-    insertar_nuevo_nodo(&raiz,74,70);//J
+        insertar_nuevo_nodo(&raiz,74,70);//J
 	insertar_nuevo_nodo(&raiz,75,70);//K
 	insertar_nuevo_nodo(&raiz,76,72);//L
 	imprimir_arbol(raiz);

@@ -82,7 +82,7 @@ hijo *buscar_entre_hermanos(hijo *hermanos,int padre)
 int insertar_nuevo_nodo(n_padre **raiz,int d,int p)
 {
 	if(!(*raiz)){
-		(*raiz)=crear_nodo_p(65);
+		(*raiz)=crear_nodo_p(d);
 		return 1;
 	}
 	if((*raiz)->dato==p)

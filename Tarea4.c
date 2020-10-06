@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
 {
 	nodoB *raiz=NULL;
 	int d,opc,n;
-	do{
+	/*do{
 		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Buscar dato en el arbol\n5->Salir\nOpcion:");
 		scanf("%i",&opc);
 		switch(opc){
@@ -53,13 +53,53 @@ int main(int argc, char const *argv[])
 				printf("Se encontro el valor en el arbol\n");
 			if(n==0)
 				printf("No se encontro el valor en el arbol\n");
+			sleep(2);
+			break;
 		}	
 		system("clear");
-	}while(opc!=5);
+	}while(opc!=5);*/
+	insertar(&raiz,120);
+	insertar(&raiz,87);
+	insertar(&raiz,43);
+	insertar(&raiz,65);
+	insertar(&raiz,140);
+	insertar(&raiz,99);
+	insertar(&raiz,130);
+	insertar(&raiz,22);
+	insertar(&raiz,56);
+	insertar(&raiz,93);
+	insertar(&raiz,135);
+
+	ver_Arbol(raiz,0,0);
+    printf("B: 22\n");
+	borrar_dato(&raiz,22);
+	ver_Arbol(raiz,0,0);
+	printf("B:99\n");
+	borrar_dato(&raiz,99);
+	ver_Arbol(raiz,0,0);
+	printf("B:87\n");
+	borrar_dato(&raiz,87);
+	ver_Arbol(raiz,0,0);
+	printf("B:120\n");
+	borrar_dato(&raiz,120);
+	ver_Arbol(raiz,0,0);
+	printf("B:140\n");
+	borrar_dato(&raiz,140);
+	ver_Arbol(raiz,0,0);
+	printf("B:135\n");
+	borrar_dato(&raiz,135);
+	ver_Arbol(raiz,0,0);
+	printf("B:56\n");
+	borrar_dato(&raiz,56);
+	ver_Arbol(raiz,0,0);
+
+
 	return 0;
 }
 nodoB* crearNodo(int d){
 	nodoB *newe=(nodoB*)malloc(sizeof(nodoB));
+	if(!newe)
+		return NULL;
 	newe->dato=d;
 	newe->der=NULL;
     newe->izq=NULL;		
@@ -67,12 +107,9 @@ nodoB* crearNodo(int d){
 }
 ///////////INSERTAR NODO A ARBOL BINARIO////////////////////////
 int insertar(nodoB **axraiz,int d){
-	if((*axraiz)==NULL){
-		nodoB *nnuevo=crearNodo(d);
-		if(!nnuevo){
-			return 0;
-		}
-		(*axraiz)=nnuevo;
+	if(!(*axraiz)){
+		//nodoB *nnuevo=crearNodo(d);
+		(*axraiz)=crearNodo(d);
 		return 1;
 	}
 	if(d>(*axraiz)->dato){
@@ -84,7 +121,7 @@ int insertar(nodoB **axraiz,int d){
 }
 //////////Imprime arbol//////////////
 void ver_Arbol(nodoB *raiz,int c,int i){
-	if(raiz==NULL){
+	if(!raiz){
 		return;
 	}
 	else{
@@ -147,12 +184,11 @@ void avance(nodoB **aux,nodoB **aux1,int *bo){
 }
 //Buscar arbol
 int buscar_dato(nodoB *raiz,int d){
-	if(raiz==NULL)
+	if(!raiz)
 		return 0;
 	if(raiz->dato==d)
 		return 1;
-	buscar_dato(raiz->der,d);
-	if(raiz->dato==d)
-		return 1;
-	buscar_dato(raiz->izq,d);
+	if(d<raiz->dato)
+		return buscar_dato(raiz->izq,d);
+	return buscar_dato(raiz->der,d);
 }

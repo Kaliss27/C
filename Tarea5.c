@@ -1,6 +1,10 @@
-//Tarea 5 Peralta Luna Karen Lisseth
+/*Tarea 5
+  Peralta Luna Karen Lisseth
+  S17002346
+*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 typedef struct nodoBinario
 {
@@ -14,45 +18,60 @@ nodoB* crearNodo(int d);
 void ver_Arbol(nodoB *raiz,int c,int i);
 int borrar_dato(nodoB **raiz,int d);
 void avance(nodoB **aux,nodoB **aux1,int *bo);
-int altura_arbol(nodoB *raiz);
+int buscar_dato(nodoB *raiz,int d);
+void contar_hojas(nodoB *raiz,int *hojas);
 
 int main(int argc, char const *argv[])
 {
 	nodoB *raiz=NULL;
-	int d,opc,a;
+	int d,opc,n,total_hojas=0;
 	do{
-		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Altura del arbol\n5->Salir\nOpci%cn:",162);
+		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Buscar dato en el arbol\n5->Contar hojas del arbol\n6->Salir\nOpcion:");
 		scanf("%i",&opc);
 		switch(opc){
 			case 1: 
-			printf("Ingresar un n%cmero entero:",163);
+			printf("Ingresar un numero entero:");
 			scanf("%i",&d);
 			insertar(&raiz,d);
 			break;
 			case 2:
 			printf("==Arbol binario==\n");
 			ver_Arbol(raiz,0,0);
-			system("pause");
+			sleep(5);
 			break;
 			case 3:
 			printf("==Arbol binario==\n");
             ver_Arbol(raiz,0,0);
-			printf("Ingresar un n%cmero entero:",163);
+			printf("Ingresar un numero entero:");
 			scanf("%i",&d);
 			borrar_dato(&raiz,d);
 			break;
 			case 4:
-			a=altura_arbol(raiz);
-			printf("Altura del arbol:%i\n",a);
-			system("pause");
+			printf("Ingrese un numero entero a buscar:");
+			scanf("%i",&d);
+			n=buscar_dato(raiz,d);
+			if(n==1)
+				printf("Se encontro el valor en el arbol\n");
+			if(n==0)
+				printf("No se encontro el valor en el arbol\n");
+			sleep(2);
+			break;
+			case 5:
+			contar_hojas(raiz,&total_hojas);
+			printf("Total de hojas: %i\n",total_hojas);
+			total_hojas=0;
+			sleep(3);
 			break;
 		}	
-	system("cls");
-	}while(opc!=5);
+		system("clear");
+	}while(opc!=6);
+
 	return 0;
 }
 nodoB* crearNodo(int d){
 	nodoB *newe=(nodoB*)malloc(sizeof(nodoB));
+	if(!newe)
+		return NULL;
 	newe->dato=d;
 	newe->der=NULL;
     newe->izq=NULL;		
@@ -60,12 +79,8 @@ nodoB* crearNodo(int d){
 }
 ///////////INSERTAR NODO A ARBOL BINARIO////////////////////////
 int insertar(nodoB **axraiz,int d){
-	if((*axraiz)==NULL){
-		nodoB *nnuevo=crearNodo(d);
-		if(!nnuevo){
-			return 0;
-		}
-		(*axraiz)=nnuevo;
+	if(!(*axraiz)){
+		(*axraiz)=crearNodo(d);
 		return 1;
 	}
 	if(d>(*axraiz)->dato){
@@ -77,7 +92,7 @@ int insertar(nodoB **axraiz,int d){
 }
 //////////Imprime arbol//////////////
 void ver_Arbol(nodoB *raiz,int c,int i){
-	if(raiz==NULL){
+	if(!raiz){
 		return;
 	}
 	else{
@@ -90,7 +105,6 @@ void ver_Arbol(nodoB *raiz,int c,int i){
 	}
 	
 }
-
 //////////////////Eliminar nodo de arbol/////////////////////////////////
 int borrar_dato(nodoB **raiz,int d){
 	nodoB *aux,*aux1,*otro;
@@ -109,7 +123,6 @@ int borrar_dato(nodoB **raiz,int d){
 					if(otro->izq==NULL){
 						(*raiz)=otro->der;
 					}else{
-
 						aux=(*raiz)->izq;
 						bo=0;
 						avance(&aux,&aux1,&bo);
@@ -129,7 +142,7 @@ int borrar_dato(nodoB **raiz,int d){
 	}
 	return 0;
 }
-//////////////////////////////////////////////////////////////////////
+
 void avance(nodoB **aux,nodoB **aux1,int *bo){
 	if((*aux)->der!=NULL){
 		(*aux1)=(*aux);
@@ -139,15 +152,26 @@ void avance(nodoB **aux,nodoB **aux1,int *bo){
 	}
 	return;
 }
-///////////////CONTAR NIVELES DEL ARBOL///////////////////////
-int altura_arbol(nodoB *raiz){
-	int h1,h2;
+////////Buscar dato en el arbol//////////////////
+int buscar_dato(nodoB *raiz,int d){
 	if(!raiz)
 		return 0;
-	h1=altura_arbol(raiz->izq);
-	h2=altura_arbol(raiz->der);
-
-	if(h1>h2)
-		return h1+1;
-	return h2+1;
+	if(raiz->dato==d)
+		return 1;
+	if(d<raiz->dato)
+		return buscar_dato(raiz->izq,d);
+	return buscar_dato(raiz->der,d);
+}
+/////////////Contar hojas del arbol/////////////////
+void contar_hojas(nodoB *raiz,int *hojas)
+{
+	if(!raiz)
+		return;
+	if(!(raiz->der) && !(raiz->izq))
+		*hojas=*hojas+1;
+	if(raiz->izq)
+		contar_hojas(raiz->izq,hojas);
+    if(raiz->der)
+    	contar_hojas(raiz->der,hojas);	
+	return;
 }

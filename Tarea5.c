@@ -13,7 +13,6 @@ typedef struct nodoBinario
 	struct nodoBinario *der;	
 }nodoB;
 
-//int insertar(nodoB **axraiz,int d);
 int insertar_balanceado(nodoB **axraiz,int d);
 nodoB* crearNodo(int d);
 void ver_Arbol(nodoB *raiz,int c,int i);
@@ -31,81 +30,9 @@ int balanceo_ID(nodoB **raiz);
 int main(int argc, char const *argv[])
 {
 	nodoB *raiz=NULL;
-	int d,opc,n,total_hojas=0,h,fe;
-	/*do{
-		printf("1->Ingresar datos al arbol\n2->Ver arbol\n3->Eliminar datos del arbol\n4->Buscar dato en el arbol\n5->Contar hojas del arbol\n6->Salir\nOpcion:");
-		scanf("%i",&opc);
-		switch(opc){
-			case 1: 
-			printf("Ingresar un numero entero:");
-			scanf("%i",&d);
-			insertar(&raiz,d);
-			break;
-			case 2:
-			printf("==Arbol binario==\n");
-			ver_Arbol(raiz,0,0);
-			sleep(5);
-			break;
-			case 3:
-			printf("==Arbol binario==\n");
-            ver_Arbol(raiz,0,0);
-			printf("Ingresar un numero entero:");
-			scanf("%i",&d);
-			borrar_dato(&raiz,d);
-			break;
-			case 4:
-			printf("Ingrese un numero entero a buscar:");
-			scanf("%i",&d);
-			n=buscar_dato(raiz,d);
-			if(n==1)
-				printf("Se encontro el valor en el arbol\n");
-			if(n==0)
-				printf("No se encontro el valor en el arbol\n");
-			sleep(2);
-			break;
-			case 5:
-			contar_hojas(raiz,&total_hojas);
-			printf("Total de hojas: %i\n",total_hojas);
-			total_hojas=0;
-			sleep(3);
-			break;
-		}	
-		system("clear");
-	}while(opc!=6);*/
-	/*insertar(&raiz,120);
-	insertar(&raiz,87);
-	insertar(&raiz,43);
-	insertar(&raiz,65);
-	insertar(&raiz,140);
-	insertar(&raiz,99);
-	insertar(&raiz,130);
-	insertar(&raiz,22);
-	insertar(&raiz,56);
-	insertar(&raiz,93);
-	insertar(&raiz,135);*/
-/*
-	insertar(&raiz,60);
-	insertar(&raiz,40);
-	insertar(&raiz,90);
-	insertar(&raiz,73);
-	insertar(&raiz,45);
-	insertar(&raiz,97);
-	insertar(&raiz,68);*/
+	int total_hojas=0;
 
-	/*insertar(&raiz,35);
-	insertar(&raiz,20);
-	insertar(&raiz,40);
-	insertar(&raiz,15);
-	insertar(&raiz,25);*/
-
-	/*insertar(&raiz,65);
-	insertar(&raiz,45);
-	insertar(&raiz,70);
-	insertar(&raiz,33);
-	insertar(&raiz,54);
-	insertar(&raiz,50);
-	insertar(&raiz,68);*/
-
+//EJEMPLO DE INSERCION BALANCEADA 6.18 (CAIRO)
 	insertar_balanceado(&raiz,65);
 	insertar_balanceado(&raiz,50);
 	insertar_balanceado(&raiz,23);
@@ -114,17 +41,48 @@ int main(int argc, char const *argv[])
 	insertar_balanceado(&raiz,68);
 	insertar_balanceado(&raiz,39);
 
-	printf("\n");
+	printf("Presentacion de nodos: (dato|fe)\n");
 	ver_Arbol(raiz,0,0);
+	
+	contar_hojas(raiz,&total_hojas);
 
-	h=altura_arbol(raiz);
+    printf("Total de hojas: %i\nAltura del arbol:%i\n",total_hojas,altura_arbol(raiz));
+    printf("FE:%i\n",equilibrio_arbol(raiz));
+
+//EJEMPLO DE INSERCION BALANCEADA 6.19 (CAIRO)
+    free(raiz);
+    raiz=NULL;
+    total_hojas=0;
+	insertar_balanceado(&raiz,58);
+	insertar_balanceado(&raiz,43);
+	insertar_balanceado(&raiz,75);
+
+	printf("Presentacion de nodos: (dato|fe)\n");
+	ver_Arbol(raiz,0,0);
+	printf("\n");
+	insertar_balanceado(&raiz,86);
+	insertar_balanceado(&raiz,65);
+	insertar_balanceado(&raiz,70);
+	insertar_balanceado(&raiz,67);
+	insertar_balanceado(&raiz,73);
+	insertar_balanceado(&raiz,93);
+	insertar_balanceado(&raiz,69);
+	insertar_balanceado(&raiz,25);
+	insertar_balanceado(&raiz,66);
+	insertar_balanceado(&raiz,68);
+	insertar_balanceado(&raiz,47);
+	insertar_balanceado(&raiz,62);
+	insertar_balanceado(&raiz,10);
+	insertar_balanceado(&raiz,60);
+
+	printf("Presentacion de nodos: (dato|fe)\n");
+	ver_Arbol(raiz,0,0);
 
 	contar_hojas(raiz,&total_hojas);
 
-	fe=equilibrio_arbol(raiz);
+    printf("Total de hojas: %i\nAltura del arbol:%i\n",total_hojas,altura_arbol(raiz));
+    printf("FE:%i\n",equilibrio_arbol(raiz));
 
-    printf("Total de hojas: %i\nAltura del arbol:%i\n",total_hojas,h);
-    printf("FE:%i\n",fe);
 	return 0;
 }
 nodoB* crearNodo(int d){
@@ -136,19 +94,7 @@ nodoB* crearNodo(int d){
     newe->izq=NULL;		
 	return newe;	
 }
-///////////INSERTAR NODO A ARBOL BINARIO////////////////////////
-/*int insertar(nodoB **axraiz,int d){
-	if(!(*axraiz)){
-		(*axraiz)=crearNodo(d);
-		return 1;
-	}
-	if(d>(*axraiz)->dato){
-		return insertar(&(*axraiz)->der,d);
-	}else{
-		if((*axraiz)->dato==d) return 2;
-		return insertar(&(*axraiz)->izq,d);
-	}	
-}*/
+
 int insertar_balanceado(nodoB **axraiz,int d)
 {
 	if(!(*axraiz)){
@@ -186,7 +132,7 @@ void ver_Arbol(nodoB *raiz,int c,int i){
 		for(i=0;i<c;i++){
 			printf("   ");
 		}
-		printf("%i fe:%i\n",raiz->dato,equilibrio_arbol(raiz));
+		printf("(%i|%i)\n",raiz->dato,equilibrio_arbol(raiz));
 		ver_Arbol(raiz->izq,c+1,0);
 	}
 	

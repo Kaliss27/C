@@ -23,6 +23,7 @@ void contar_hojas(nodoB *raiz,int *hojas);
 int altura_arbol(nodoB *raiz);
 int equilibrio_arbol(nodoB *raiz);
 
+
 int main(int argc, char const *argv[])
 {
 	nodoB *raiz=NULL;
@@ -78,6 +79,28 @@ int main(int argc, char const *argv[])
 	insertar(&raiz,56);
 	insertar(&raiz,93);
 	insertar(&raiz,135);
+/*
+	insertar(&raiz,60);
+	insertar(&raiz,40);
+	insertar(&raiz,90);
+	insertar(&raiz,73);
+	insertar(&raiz,45);
+	insertar(&raiz,97);
+	insertar(&raiz,68);*/
+
+	/*insertar(&raiz,35);
+	insertar(&raiz,20);
+	insertar(&raiz,40);
+	insertar(&raiz,15);
+	insertar(&raiz,25);*/
+
+	/*insertar(&raiz,65);
+	insertar(&raiz,45);
+	insertar(&raiz,70);
+	insertar(&raiz,33);
+	insertar(&raiz,54);
+	insertar(&raiz,50);
+	insertar(&raiz,68);*/
 
 	ver_Arbol(raiz,0,0);
 
@@ -123,7 +146,7 @@ void ver_Arbol(nodoB *raiz,int c,int i){
 		for(i=0;i<c;i++){
 			printf("   ");
 		}
-		printf("%i\n",raiz->dato);
+		printf("%i fe:%i\n",raiz->dato,equilibrio_arbol(raiz));
 		ver_Arbol(raiz->izq,c+1,0);
 	}
 	
@@ -200,7 +223,8 @@ void contar_hojas(nodoB *raiz,int *hojas)
 }
 
 ///////////////Calcular altura del arbol///////////////////////
-int altura_arbol(nodoB *raiz){
+int altura_arbol(nodoB *raiz)
+{
 	int h1,h2;
 	if(!raiz)
 		return 0;
@@ -211,7 +235,8 @@ int altura_arbol(nodoB *raiz){
 	return h2+1;
 }
 /////////Calcular Factor de Equilibrio/////////////////////
-int equilibrio_arbol(nodoB *raiz){
+int equilibrio_arbol(nodoB *raiz)
+{
 	int h1,h2;
 	if(!raiz)
 		return 0;

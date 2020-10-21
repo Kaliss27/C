@@ -47,38 +47,72 @@ nodoB* crearNodo(char d){
     newe->izq=NULL;		
 	return newe;	
 }
+char seleccionar_operador(char *cadena)
+{
+	char c;
+	if(strchr(cadena,'+'))
+		    c='+';
+	    else
+		    if(strchr(cadena,'-'))
+			    c='-';
+		    else
+			    if(strchr(cadena,'*'))
+				    c='*';
+			    else
+				    if(strchr(cadena,'/'))
+		     		    c='/';
+		     	    else
+		     	    	c='0';
+	return c;	     	    
+}
 int separar(char *cadena,char *cad_izq,char *cad_der,nodoB **raiz)
 {
 	if(!cadena)
 		return 0;
-	char c,temp,axi[10],auxd[10];
+	char c,temp,axi[10],auxd[10],aux_i[10];
 	int bnd=0;
-	//printf("cadena izq:%s\ncadena der:%s\n",cad_izq,cad_der);
-	if(strchr(cadena,'+'))
-		c='+';
-	else
-		if(strchr(cadena,'-'))
-			c='-';
-		else
-			if(strchr(cadena,'*'))
-				c='*';
-			else
-				if(strchr(cadena,'/'))
-		     		c='/';
-		     	else
-		     		{
-		     			printf("no hay operadores\n");
-		     			insertar(raiz,*cadena);
-		     			return 0;
-		     		}
+
+	if(strchr(cadena,'('))
+	{
+		strcpy(aux_i,cadena);
+		strcpy(aux_i,strtok(aux_i+1,")"));
+		bnd=1;
+		printf("Cadena:%s\n",aux_i);
+		//printf("%s\n",strstr(cadena,")"));
+		c=seleccionar_operador(strstr(cadena,")"));
+		strcpy(cad_der,strstr(cadena,")")+2);
+        //cad_der=strstr(cad_der,&c);
+	    //strcpy(cad_der,cad_der+1);
+	}else
+	{
+		c=seleccionar_operador(cadena);
+		if(c=='0')
+		{
+			printf("no hay operadores\n");
+		    insertar(raiz,*cadena);
+ 			return 0;
+		}
+		strcpy(cad_der,cadena);
+    cad_der=strstr(cad_der,&c);
+	strcpy(cad_der,cad_der+1);
+	}
     printf("c:%c\nvuelta\n",c);
 	insertar(raiz,c);
-	printf("cadena izq:%s\ncadena der:%s\n",cad_izq,cad_der);
-	strcpy(cad_der,cadena);
-    strcpy(cad_izq,cadena);
-    strtok(cad_izq,&c);
-	cad_der=strstr(cad_der,&c);
-	strcpy(cad_der,cad_der+1);/*/memchr(cad_der,c, strlen(cad_der));*/
+	if(bnd==1)
+		strcpy(cad_izq,aux_i);
+	else
+	{
+		strcpy(cad_izq,cadena);
+		strtok(cad_izq,&c);
+	}
+	/*
+    strcpy(cad_der,cadena);
+	//printf("cadena izq:%s\ncadena der:%s\n",cad_izq,cad_der);
+    //strcpy(cad_der,cadena);
+    cad_der=strstr(cad_der,&c);
+    printf("%s\n",cad_der);
+	strcpy(cad_der,cad_der+1);*/
+    
 	printf("cadena izq:%s\ncadena der:%s\n",cad_izq,cad_der);
 	if(!(*raiz)->izq)
 		separar(cad_izq,axi,auxd,&(*raiz)->izq);

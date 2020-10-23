@@ -92,17 +92,21 @@ char seleccionar_operador_f(char *cadena,int *bnd)
 		if(loc==len-1 && locc!=0) // los signos de agrupaciòn son los ultimos en la cadena 
 			{
 				c=seleccionar_operador(strtok(aux,"("));
-		}else{
-			if(locc==0) // los signos de agrupaciòn son los primeros en la cadena 
-			{
-				c=seleccionar_operador(strstr(cadena,")")+1);
 				return c;
+		}else{
+			if(loc==len-1 && locc==0) // los signos de agrupaciòn son los primeros en la cadena 
+			{
+			printf("ax2:%s\n",strcpy(aux,cadena));
+		    c=seleccionar_operador(strtok(aux,")"));	
+		    *bnd=1;
+		    printf("sef:%c\n",c);   
+		    return c;	
+			}else{
+				if(locc==0){
+					c=seleccionar_operador(strstr(cadena,")")+1);
+				    return c;
+				}
 			}
-		printf("ax2:%s\n",strcpy(aux,cadena));
-		c=seleccionar_operador(strtok(aux+1,")"));	
-		*bnd=1;
-		printf("sef:%c\n",c);   
-		return c;
 	}
     }
     printf("%s\n",cadena);
@@ -114,6 +118,18 @@ void separar_cadenas(char *cad_i,char *cad_d,char *cad,char *c)
 {
 	char *temp,cc;
 	cc=*c;
+	int loc,locc,len;
+	len=strlen(cad);
+	if(strchr(cad,'(') && strchr(cad,')')){
+		printf("\n()\n");
+		locc=strcspn(cad,"(");
+		loc=strcspn(cad,")");
+		if(locc==len-1 && loc==0){
+			strcpy(temp,cad);
+			strcpy(cad,strtok(temp+1,")"));
+		}
+	}
+	printf("()()\n");
 	strcpy(cad_d,cad);
 	strcpy(cad_i,cad);
 	cad_i=strtok(cad_i,c);

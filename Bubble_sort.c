@@ -14,20 +14,20 @@ typedef struct elemento_lista
 //Funciones
 int agregar_inicio(e_lista **inicio,int num);
 void ver_lista(e_lista *inicio);
-void bubble_sort(e_lista **inicio,int n_elem); 
-void swap(e_lista *aux1,e_lista *aux2,e_lista *new_f);
+void bubble_sort(e_lista **inicio); 
+void swap(e_lista **aux1,e_lista **aux2,e_lista **new_f);
 int count_elem(e_lista *inicio,int c);
-
+void ordenamiento(e_lista **inicio,int n_elem);
 int main(int argc, char const *argv[])
 {
 	e_lista *inicio_l1=NULL;
 	agregar_inicio(&inicio_l1,27);
 	agregar_inicio(&inicio_l1,7);
 	agregar_inicio(&inicio_l1,18);
-	//agregar_inicio(&inicio_l1,24);
-	//agregar_inicio(&inicio_l1,4);
+	agregar_inicio(&inicio_l1,24);
+	agregar_inicio(&inicio_l1,4);
 	ver_lista(inicio_l1);
-	bubble_sort(&inicio_l1,count_elem(inicio_l1,0)+1);
+	ordenamiento(&inicio_l1,count_elem(inicio_l1,0)+1);
 	printf("\n");
 	ver_lista(inicio_l1);
 	return 0;
@@ -64,43 +64,55 @@ int count_elem(e_lista *inicio,int c)
 	c++;
 	return count_elem(inicio->sig,c);
 }
-void swap(e_lista *aux1,e_lista *aux2,e_lista *new_f)
+void swap(e_lista **aux1,e_lista **aux2,e_lista **new_f)
 {
-	printf("aux1:%i\naux2:%i\n",aux1->dato,aux2->dato);
-	e_lista *aux_a=aux1->ant;
-	aux_a->sig=aux2;
-	aux1->sig=aux2->sig;
-	aux1->ant=aux_a->sig;
-	aux2->ant=aux_a;
-	aux2->sig=aux1;
-	aux2=aux1;
-	aux1=aux_a->sig;
-	printf("aux1:%i\naux2:%i\n",aux1->dato,aux2->dato);
-	if(!aux1->ant)
-		new_f=aux1;
+	e_lista *aux=(*aux1);
+	e_lista *auxx=(*aux1)->ant;
+
+	(*aux1)=(*aux2);
+	(*aux2)=aux;
+	(*aux1)->ant=(*aux2)->ant;
+	(*aux2)->ant=(*aux1);
+	(*aux2)->sig=(*aux1)->sig;
+	(*aux1)->sig=(*aux2);
+
+	aux=(*aux2)->sig;
+	aux->ant=(*aux2);
+
+	if(auxx)
+	{
+		auxx->sig=(*aux1);
+	}
+	if(!(*aux1)->ant)
+		(*new_f)=(*aux1);
 	return;
 }
 
-void bubble_sort(e_lista **inicio,int n_elem) 
+void bubble_sort(e_lista **inicio) 
 {
 	if (!(*inicio))
 	{
 		return;
 	}
-	printf("\nebubble\n");
-	printf("inicio:%i\nn_e:%i\n",(*inicio)->dato,n_elem);
-	int bnd;
 	e_lista *actual,*siguiente;
 	actual=(*inicio);
 	siguiente=(*inicio)->sig;
 	while(siguiente)
 	{
+		printf("\n1:\nactual:%i\nsig:%i\n",actual->dato,siguiente->dato);
 		if(actual->dato > siguiente->dato)
-			swap(actual,siguiente,(*inicio));
-		printf("hii\n");
+			swap(&actual,&siguiente,inicio);
 		actual=siguiente;
-		siguiente=siguiente->sig;
+	    siguiente=siguiente->sig;
 	}
-	bubble_sort(&(*inicio)->sig,n_elem);
+	bubble_sort(&(*inicio)->sig);
+	printf("inicio:%i\n",(*inicio)->dato);
 	return;
+}
+void ordenamiento(e_lista **inicio,int n_elem)
+{
+	for(int i=0;i<n_elem;i++)
+	{
+		bubble_sort(inicio);
+	}
 }

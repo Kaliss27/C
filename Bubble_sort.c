@@ -21,14 +21,20 @@ void ordenamiento(e_lista **inicio,int n_elem);
 int main(int argc, char const *argv[])
 {
 	e_lista *inicio_l1=NULL;
-	agregar_inicio(&inicio_l1,27);
-	agregar_inicio(&inicio_l1,7);
-	agregar_inicio(&inicio_l1,18);
-	agregar_inicio(&inicio_l1,24);
+	// Ejemplo del video
+	agregar_inicio(&inicio_l1,9);
+	agregar_inicio(&inicio_l1,6);
 	agregar_inicio(&inicio_l1,4);
+	agregar_inicio(&inicio_l1,5);
+	agregar_inicio(&inicio_l1,2);
+	agregar_inicio(&inicio_l1,7);
+	agregar_inicio(&inicio_l1,8);
+	agregar_inicio(&inicio_l1,1);
+	agregar_inicio(&inicio_l1,0);
+	agregar_inicio(&inicio_l1,3);
 	ver_lista(inicio_l1);
 	ordenamiento(&inicio_l1,count_elem(inicio_l1,0)+1);
-	printf("\n");
+	printf("\nBubble Sort\n");
 	ver_lista(inicio_l1);
 	return 0;
 }
@@ -74,17 +80,21 @@ void swap(e_lista **aux1,e_lista **aux2,e_lista **new_f)
 	(*aux1)->ant=(*aux2)->ant;
 	(*aux2)->ant=(*aux1);
 	(*aux2)->sig=(*aux1)->sig;
+
 	(*aux1)->sig=(*aux2);
 
 	aux=(*aux2)->sig;
-	aux->ant=(*aux2);
+	if(aux)     //Verifica si se cambia con el ultimo elemento de la lista
+		aux->ant=(*aux2);
 
-	if(auxx)
+	if(auxx)    //Verifica si se cambia con el primer elemento de la lista
 	{
 		auxx->sig=(*aux1);
 	}
-	if(!(*aux1)->ant)
+
+	if(!(*aux1)->ant)  //Modifica el puntero a inicio de la lista, en caso de que el primer elemento haya cambiado
 		(*new_f)=(*aux1);
+
 	return;
 }
 
@@ -97,16 +107,15 @@ void bubble_sort(e_lista **inicio)
 	e_lista *actual,*siguiente;
 	actual=(*inicio);
 	siguiente=(*inicio)->sig;
+	
 	while(siguiente)
 	{
-		printf("\n1:\nactual:%i\nsig:%i\n",actual->dato,siguiente->dato);
 		if(actual->dato > siguiente->dato)
 			swap(&actual,&siguiente,inicio);
 		actual=siguiente;
 	    siguiente=siguiente->sig;
 	}
 	bubble_sort(&(*inicio)->sig);
-	printf("inicio:%i\n",(*inicio)->dato);
 	return;
 }
 void ordenamiento(e_lista **inicio,int n_elem)

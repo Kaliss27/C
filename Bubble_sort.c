@@ -15,7 +15,7 @@ typedef struct elemento_lista
 int agregar_inicio(e_lista **inicio,int num);
 void ver_lista(e_lista *inicio);
 void bubble_sort(e_lista **inicio,int n_elem); 
-void swap(e_lista *aux1,e_lista *aux2,e_lista **new_f);
+void swap(e_lista *aux1,e_lista *aux2,e_lista *new_f);
 int count_elem(e_lista *inicio,int c);
 
 int main(int argc, char const *argv[])
@@ -24,8 +24,8 @@ int main(int argc, char const *argv[])
 	agregar_inicio(&inicio_l1,27);
 	agregar_inicio(&inicio_l1,7);
 	agregar_inicio(&inicio_l1,18);
-	agregar_inicio(&inicio_l1,24);
-	agregar_inicio(&inicio_l1,4);
+	//agregar_inicio(&inicio_l1,24);
+	//agregar_inicio(&inicio_l1,4);
 	ver_lista(inicio_l1);
 	bubble_sort(&inicio_l1,count_elem(inicio_l1,0)+1);
 	printf("\n");
@@ -64,49 +64,43 @@ int count_elem(e_lista *inicio,int c)
 	c++;
 	return count_elem(inicio->sig,c);
 }
-void swap(e_lista *aux1,e_lista *aux2,e_lista **new_f)
+void swap(e_lista *aux1,e_lista *aux2,e_lista *new_f)
 {
 	printf("aux1:%i\naux2:%i\n",aux1->dato,aux2->dato);
-	e_lista *aux_a=aux2->sig;
-	printf("aux_a:%i\n",aux_a->dato);
-	aux1->sig=aux_a;
-	aux_a->ant=aux1;
+	e_lista *aux_a=aux1->ant;
+	aux_a->sig=aux2;
+	aux1->sig=aux2->sig;
+	aux1->ant=aux_a->sig;
+	aux2->ant=aux_a;
 	aux2->sig=aux1;
-	aux2->ant=aux1->ant;
-	aux1->ant=aux2;
-	if(!aux2->ant)
-		(*new_f)=aux2;
+	aux2=aux1;
+	aux1=aux_a->sig;
+	printf("aux1:%i\naux2:%i\n",aux1->dato,aux2->dato);
+	if(!aux1->ant)
+		new_f=aux1;
 	return;
 }
 
 void bubble_sort(e_lista **inicio,int n_elem) 
 {
+	if (!(*inicio))
+	{
+		return;
+	}
 	printf("\nebubble\n");
 	printf("inicio:%i\nn_e:%i\n",(*inicio)->dato,n_elem);
-	int i,j,i_swap;
-	i=n_elem-1;
-	while(i>0)
+	int bnd;
+	e_lista *actual,*siguiente;
+	actual=(*inicio);
+	siguiente=(*inicio)->sig;
+	while(siguiente)
 	{
-		i_swap=0;
-		for(j=0;j<i;j++)
-		{
-			printf("for:%i\n",j);
-			if(!(*inicio)->sig)
-			{
-				return;
-			}
-			if((*inicio)->sig->dato < (*inicio)->dato)
-			{
-				printf("swappp\n");
-				swap((*inicio),(*inicio)->sig,inicio);
-				i_swap=i;
-			}
-			ver_lista((*inicio));
-			i=i_swap;
-			printf("%i\n",i);
-			bubble_sort(&(*inicio)->sig,count_elem((*inicio),0));
-		}
-		bubble_sort(&(*inicio)->sig,count_elem((*inicio),0));
+		if(actual->dato > siguiente->dato)
+			swap(actual,siguiente,(*inicio));
+		printf("hii\n");
+		actual=siguiente;
+		siguiente=siguiente->sig;
 	}
+	bubble_sort(&(*inicio)->sig,n_elem);
 	return;
 }

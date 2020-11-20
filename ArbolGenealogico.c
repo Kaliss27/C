@@ -107,7 +107,6 @@ hijo *buscar_entre_hermanos(hijo *hermanos,char *padre)
 	if(!hermanos)
 		return NULL;
 	if(strcmp(hermanos->raiz->nombre,padre)==0)
-	//if(hermanos->raiz->nombre==padre)
 		return hermanos;
 	buscar_entre_hermanos(hermanos->hermano,padre);
 }

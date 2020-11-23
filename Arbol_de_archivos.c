@@ -1,4 +1,4 @@
-/*Tarea: Arbol Genealogico
+/*Tarea: Arbol de archivos
 -Peralta Luna Karen Lisseth
 -S17002346
 */
@@ -41,6 +41,8 @@ void imprimir_hojas(hijo *frente,int c,int i);
 void imprimir_arbol(n_padre *raiz,int c,int i);
 hijo *buscar_entre_hermanos(hijo *hermanos,char *padre);
 int insertar_nuevo_hermano(hijo *nhijo,hijo **fin);
+void eliminar(n_padre **cola,char *padre);
+void eliminar_x(hijo **cola,hijo *x,hijo **final);
 void menu();
 int main(int argc, char const *argv[])
 {
@@ -63,7 +65,6 @@ int main(int argc, char const *argv[])
 			printf("Ingrese el nombre de su nuevo folder\n");
 			scanf("%19s",name);
 			insertar_nuevo_nodo(&raiz,name,namep,0);
-			sleep(4);
 			break;
 			case 2:
 			imprimir_arbol(raiz,0,0);
@@ -73,7 +74,13 @@ int main(int argc, char const *argv[])
 			scanf("%19s",name);
 			insertar_nuevo_nodo(&raiz,name,namep,1);
 			break;
-			case 3:break;
+			case 3:
+			imprimir_arbol(raiz,0,0);
+			printf("Ingrese el nombre del archivo a eliminar:");
+			scanf("%s",name);
+			eliminar(&raiz,name);
+			printf("Eliminado\n");
+			break;
 			case 4:break;
 			case 5:
 			imprimir_arbol(raiz,0,0);
@@ -223,4 +230,47 @@ void imprimir_arbol(n_padre *raiz,int c,int i)
 		imprimir_hojas(raiz->frente,c+1,0);
 	}
 	return;
+}
+void eliminar(n_padre **cola,char *padre)
+{
+	if(!(*cola))
+	{
+		printf("Cola vacia. No existen elementos a eliminar\n");
+		return;
+	}
+	hijo *buq=buscar_entre_hermanos((*cola)->frente,padre);
+	printf("%p\n",buq);
+	if(!buq)
+	{
+		printf("No existe tal elemento en la cola\n");
+		return;
+	}
+	if((*cola)->frente==(*cola)->final)
+	{
+		free(buq);
+		(*cola)->frente=NULL;
+		(*cola)->final=NULL;
+		return;
+	}
+	if((*cola)->frente==buq){
+		(*cola)->frente=buq->hermano;
+		free(buq);
+		return;
+	}
+	eliminar_x(&(*cola)->frente,buq,&(*cola)->final);
+	return;
+}
+
+void eliminar_x(hijo **cola,hijo *x,hijo **final)
+{
+	if((*cola)->hermano==x)
+	{
+		hijo *aux=x->hermano;
+		(*cola)->hermano=aux;
+		if(!x->hermano)
+		    (*final)=aux;
+		free(x);
+		return;
+	}
+	eliminar_x(&(*cola)->hermano,x,final);
 }

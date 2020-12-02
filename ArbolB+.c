@@ -7,6 +7,8 @@
 
 #define D 2 
 
+/*Estructuras*/
+
 typedef struct datos_almacenados   //Estructura que almacenara los datos pertenecientes a cada clave
 {
 	int id;
@@ -26,12 +28,22 @@ typedef struct pagina // Estructura para almacenar los distintos elementos pagin
 	struct pagina *ant;
 }page;
 
+/* Declaracion de Funciones*/
+
 int insercion(page **raiz,int id);
 page *crear_pagina(int d);
+page *crear_pagina_p(); 
 clave *crear_clave(int d);
+datos *crear_datos(int d);
 void ver_claves_en_pag(clave *inicio);
 void insertar_claves_en_pag(clave **raiz_p,int d);
 int calcular_m(clave *raiz);
+clave ** clave_centro(clave **raiz, int c);
+clave *crear_pag_izq();
+void modificar_clave(clave **clv,int aux);
+void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo);
+clave **buscar_clave(page  **raiz,int id_b);
+clave **buscar_clave_en_pag(clave **inicio,int id_b);
 
 int main(int argc, char const *argv[])
 {
@@ -48,8 +60,14 @@ int main(int argc, char const *argv[])
     clave *aux=raiz->inicio;
     ver_claves_en_pag(aux->abajo->inicio);
     printf("\n");
+    int b=35;
+    if(buscar_clave(&raiz,b))
+    	printf("%i Encontrado\n",b);
+    else
+    	printf("# no encontrado\n");
 	return 0;
 }
+/*Cuerpo de funciones*/
 
 datos *crear_datos(int d)  //Aloja espacio de memoria para los datos a almacenar
 {
@@ -127,6 +145,36 @@ clave *crear_pag_izq() // Aloja espacio de memoria para un elemento clave inicia
 	newe->sig=NULL;
 	return newe;
 }
+
+clave **buscar_clave_en_pag(clave **inicio,int id_b)
+{
+	if(!(*inicio))
+		return NULL;
+	if((*inicio)->clv == id_b)
+		return inicio;
+	return buscar_clave_en_pag(&(*inicio)->sig,id_b);
+}
+clave **buscar_clave(page  **raiz,int id_b)
+{
+	if((*raiz))
+	{
+		clave **aux=buscar_clave_en_pag(&(*raiz)->inicio,id_b);
+		if(aux)
+			return aux;
+		clave *aux_c=(*raiz)->inicio;
+		if(id_b < aux_c->clv)
+			return buscar_clave(&(*raiz)->ant,id_b);
+		clave *aux_c1=aux_c->sig;
+		if(aux_c->clv < id_b < aux_c1->clv)
+			return buscar_clave(&(*raiz)->inicio->abajo,id_b);
+		aux_c1=aux_c1->sig;
+		if(id_b > aux_c1->clv)
+			return buscar_clave(&aux_c1->abajo,id_b);
+	}
+	else
+		return NULL;
+}
+
 void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o no hoja
 {
 	(*clv)->clv=aux;

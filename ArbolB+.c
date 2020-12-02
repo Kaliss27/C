@@ -41,7 +41,12 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,27);
 	insercion(&raiz,18);
 	insercion(&raiz,7);
-	ver_claves_en_pag(raiz->inicio);
+	ver_claves_en_pag(raiz->ant->inicio);
+    printf("\t");
+    ver_claves_en_pag(raiz->inicio);
+    printf("\t");
+    clave *aux=raiz->inicio;
+    ver_claves_en_pag(aux->abajo->inicio);
     printf("\n");
 	return 0;
 }
@@ -67,11 +72,11 @@ clave *crear_clave(int d) //Aloja espacio de memoria para almacenar las claves a
 	return newe;
 }
 
-clave ** clave_centro(clave **raiz, int c)
+clave ** clave_centro(clave **raiz, int c) //Obtiene la clave que se encuentre al centro de una pagina
 {
     if (!raiz)
         return NULL;
-    if (cont == D)
+    if (c == D)
         return raiz;
     return clave_centro(&(*raiz)->sig,c+1);
 }
@@ -85,7 +90,7 @@ page *crear_pagina(int d) // Aloja espacio de memoria para cada pagina
 	newe->ant=NULL;
 	return newe;
 }
-page **crear_pagina_p( ) // Aloja espacio de memoria para cada pagina
+page *crear_pagina_p( ) // Aloja espacio de memoria para cada pagina
 {
 	page *newe=(page*)malloc(sizeof(page));
 	if(!newe)
@@ -111,15 +116,36 @@ void insertar_claves_en_pag(clave **raiz_p,int d) // Interta claves en una pagin
 	return;
 }
 
-void modificar_paginas(clave **centro,pagina **ant,pagina **abajo) // Partir pagina...
+clave *crear_pag_izq() // Aloja espacio de memoria para un elemento clave inicial, que podrà ser usado en nuevas paginas
 {
-	(*centro)->datos_alm->= izq;
-    (*centro)->dato->der = der;
-    izq->inicio = (*raiz)->inicio;
-    der->inicio = (*centro)->sig;
-    (*raiz)->inicio = *centro;
-    (*centro)->sig = NULL;
-    (*centro) = NULL;
+	clave *newe=(clave*)malloc(sizeof(clave));
+	if(!newe)
+		return NULL;
+	newe->clv=0;
+	newe->datos_alm=NULL;
+	newe->abajo=NULL;
+	newe->sig=NULL;
+	return newe;
+}
+void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o no hoja
+{
+	(*clv)->clv=aux;
+	(*clv)->sig=NULL;
+	(*clv)->datos_alm=NULL;
+	return;
+}
+void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Partir pagina...
+{        																	//Sube la clave central a la pagina antecesora
+	clave *aux_c=crear_pag_izq();											//Acomoda en puntero anterior de la pagina, y 
+	(*ant)->inicio=(*raiz)->inicio;											// el puntero "abajo" de cada elemento de la pagina
+	(*raiz)->ant=(*ant);
+	aux_c->abajo=(*abajo);
+	modificar_clave(&aux_c,(*centro)->clv);
+	(*abajo)->inicio=(*centro);
+	(*raiz)->inicio=aux_c;
+	(*raiz)->inicio->abajo=(*abajo);
+	(*centro)=NULL;
+	return;
 }
 int insercion(page **raiz,int id) // Operacion general de insercion
 {
@@ -133,14 +159,13 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 	if(calcular_m((*raiz)->inicio) > 2*D)
 	{
 		clave **centro=clave_centro(&(*raiz)->inicio,0);
-		pagina **n_ant=crear_pagina_p();
-		pagina **n_abajo=crear_pagina_p();
+		page *n_ant=crear_pagina_p();
+		page *n_abajo=crear_pagina_p();
 		if(!(n_ant || n_abajo))
 			return 0;
-		modificar_paginas(centro,n_ant,n_abajo);
-	}
+		modificar_paginas(raiz,centro,&n_ant,&n_abajo); //Modifica la estructura del arbol.
 	return 1;
-
+    }
 }
 void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una pagina
 {

@@ -60,11 +60,11 @@ int main(int argc, char const *argv[])
     clave *aux=raiz->inicio;
     ver_claves_en_pag(aux->abajo->inicio);
     printf("\n");
-    int b=35;
+    int b=33;
     if(buscar_clave(&raiz,b))
     	printf("%i Encontrado\n",b);
     else
-    	printf("# no encontrado\n");
+    	printf("#%i no encontrado\n",b);
 	return 0;
 }
 /*Cuerpo de funciones*/
@@ -146,7 +146,7 @@ clave *crear_pag_izq() // Aloja espacio de memoria para un elemento clave inicia
 	return newe;
 }
 
-clave **buscar_clave_en_pag(clave **inicio,int id_b)
+clave **buscar_clave_en_pag(clave **inicio,int id_b) //Busca una clave dentro de una pagina dada
 {
 	if(!(*inicio))
 		return NULL;
@@ -154,17 +154,32 @@ clave **buscar_clave_en_pag(clave **inicio,int id_b)
 		return inicio;
 	return buscar_clave_en_pag(&(*inicio)->sig,id_b);
 }
-clave **buscar_clave(page  **raiz,int id_b)
+clave **buscar_clave(page  **raiz,int id_b) //Busca la clave en todo el arbol, de acuerdo a sus condiciones
 {
 	if((*raiz))
 	{
 		clave **aux=buscar_clave_en_pag(&(*raiz)->inicio,id_b);
-		if(aux)
-			return aux;
+		if(aux){
+			//printf("yeii\n");
+			if(!((*raiz)->ant) && !((*aux)->abajo))
+				return aux;
+			page *aux_p=(*aux)->abajo;
+			//printf("%i\n",aux_p->inicio->clv);
+			return buscar_clave(&aux_p,id_b);
+		}
 		clave *aux_c=(*raiz)->inicio;
 		if(id_b < aux_c->clv)
 			return buscar_clave(&(*raiz)->ant,id_b);
 		clave *aux_c1=aux_c->sig;
+		if(!aux_c1)
+			{
+				if(id_b > aux_c->clv)
+				{
+					//printf("%i mayor que %i\n",id_b,aux_c->clv);
+					return buscar_clave(&aux_c->abajo,id_b);
+				}
+				return NULL;
+			}
 		if(aux_c->clv < id_b < aux_c1->clv)
 			return buscar_clave(&(*raiz)->inicio->abajo,id_b);
 		aux_c1=aux_c1->sig;

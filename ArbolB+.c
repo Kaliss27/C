@@ -59,6 +59,9 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,7);
 	insercion(&raiz,30);
 	insercion(&raiz,27);
+	insercion(&raiz,5);
+	insercion(&raiz,32);
+	insercion(&raiz,31);
 	ver_claves_en_pag(raiz->ant->inicio);
     printf("\t");
     ver_claves_en_pag(raiz->inicio);
@@ -230,6 +233,10 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		if(raiz)
 			return 1;
 	}
+	if((*raiz)->ant && id<(*raiz)->inicio->clv) //Verifica si existen paginas anteriores y corrobora que el numero a insertar sea menor
+		return insercion(&(*raiz)->ant,id);     //inicial de la pagina
+	if((*raiz)->inicio->abajo && id > (*raiz)->inicio->clv) //Verifica si existen claves mayores a la clave actual 
+		return insercion(&(*raiz)->inicio->abajo,id);
 	insertar_claves_en_pag(&(*raiz)->inicio,id);
 	ordenamiento(&(*raiz)->inicio,count_elem((*raiz)->inicio,0)+1);
 	if(calcular_m((*raiz)->inicio) > 2*D)

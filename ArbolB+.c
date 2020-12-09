@@ -61,7 +61,9 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,27);
 	insercion(&raiz,5);
 	insercion(&raiz,32);
-	insercion(&raiz,31);
+	insercion(&raiz,9);
+	//insercion(&raiz,31);
+	//insercion(&raiz,10);
 	ver_claves_en_pag(raiz->ant->inicio);
     printf("\t");
     ver_claves_en_pag(raiz->inicio);
@@ -148,6 +150,21 @@ void insertar_claves_en_pag(clave **raiz_p,int d) // Interta claves en una pagin
 	return;
 }
 
+void insertar_claves_en_pag_n(clave **raiz_p,clave *newe) // Interta claves en una pagina
+{
+	printf("inpn\n");
+	if(!(*raiz_p))
+		return;
+	if(!(*raiz_p))
+		newe->ant=(*raiz_p);
+	else
+		(*raiz_p)->ant=newe;
+	newe->sig=(*raiz_p);
+	(*raiz_p)=newe;
+	printf("finall\n");
+	return;
+}
+
 clave *crear_pag_izq() // Aloja espacio de memoria para un elemento clave inicial, que podrà ser usado en nuevas paginas
 {
 	clave *newe=(clave*)malloc(sizeof(clave));
@@ -158,6 +175,16 @@ clave *crear_pag_izq() // Aloja espacio de memoria para un elemento clave inicia
 	newe->abajo=NULL;
 	newe->sig=NULL;
 	return newe;
+}
+
+clave **buscar_clave_mayor(clave **inicio,int id_b)
+{
+	printf("clave mayor:%i\nb:%i",(*inicio)->clv,id_b);
+	if(!(*inicio))
+		return NULL;
+	if((*inicio)->clv < id_b)
+		return inicio;
+	return buscar_clave_en_pag(&(*inicio)->sig,id_b);
 }
 
 clave **buscar_clave_en_pag(clave **inicio,int id_b) //Busca una clave dentro de una pagina dada
@@ -235,9 +262,25 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 	}
 	if((*raiz)->ant && id<(*raiz)->inicio->clv) //Verifica si existen paginas anteriores y corrobora que el numero a insertar sea menor
 		return insercion(&(*raiz)->ant,id);     //inicial de la pagina
-	if((*raiz)->inicio->abajo && id > (*raiz)->inicio->clv) //Verifica si existen claves mayores a la clave actual 
-		return insercion(&(*raiz)->inicio->abajo,id);
-	insertar_claves_en_pag(&(*raiz)->inicio,id);
+	/*if((*raiz)->inicio->abajo && id > (*raiz)->inicio->clv) //Verifica si existen claves mayores a la clave actual 
+		insercion(&(*raiz)->inicio->abajo,id);*/
+	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
+	int bnd=0;
+	printf("%p\n",aux_mayor);
+	if(aux_mayor && ((*aux_mayor)->abajo))
+		{
+			insercion(&(*aux_mayor)->abajo,id);
+			//clave *newe=crear_pag_izq();
+			//printf("..\n");
+			//newe->clv=id;
+			//printf("%i\n",newe->clv);
+			//insertar_claves_en_pag_n(&(*raiz)->inicio,newe);
+			//printf("before returnn\n");
+			bnd=1;
+			//modificar_clave(&(*aux_mayor)->sig,id);
+		}
+	if(bnd==0)
+		insertar_claves_en_pag(&(*raiz)->inicio,id);
 	ordenamiento(&(*raiz)->inicio,count_elem((*raiz)->inicio,0)+1);
 	if(calcular_m((*raiz)->inicio) > 2*D)
 	{

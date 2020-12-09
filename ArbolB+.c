@@ -45,6 +45,7 @@ void modificar_clave(clave **clv,int aux);
 void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo);
 clave **buscar_clave(page  **raiz,int id_b);
 clave **buscar_clave_en_pag(clave **inicio,int id_b);
+void subir_clave(clave **actual,clave *sig,page *abajo);
 //****Fuciones para relizar el metodo bubblesort para ordenar las claves en una pagina
 void bubble_sort(clave **inicio); 
 void swap(clave **aux1,clave **aux2,clave **new_f);
@@ -62,14 +63,14 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,5);
 	insercion(&raiz,32);
 	insercion(&raiz,9);
-	//insercion(&raiz,31);
+	insercion(&raiz,31);
 	//insercion(&raiz,10);
-	ver_claves_en_pag(raiz->ant->inicio);
+	/*ver_claves_en_pag(raiz->ant->inicio);
     printf("\t");
     ver_claves_en_pag(raiz->inicio);
     printf("\t");
     clave *aux=raiz->inicio;
-    ver_claves_en_pag(aux->abajo->inicio);
+    ver_claves_en_pag(aux->abajo->inicio);*/
     printf("\n");
     int b=35;
     if(buscar_clave(&raiz,b))
@@ -269,15 +270,14 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 	printf("%p\n",aux_mayor);
 	if(aux_mayor && ((*aux_mayor)->abajo))
 		{
-			insercion(&(*aux_mayor)->abajo,id);
-			//clave *newe=crear_pag_izq();
-			//printf("..\n");
-			//newe->clv=id;
-			//printf("%i\n",newe->clv);
-			//insertar_claves_en_pag_n(&(*raiz)->inicio,newe);
-			//printf("before returnn\n");
+			insercion(&(*aux_mayor)->abajo,id); //Inserta sin llevarse arriba a otra clave..
+			if((*raiz)->inicio->abajo->ant)
+			{
+				printf("%i....\n", (*raiz)->inicio->clv);     //Lleva arriba una clave
+				(*raiz)->inicio->sig=(*raiz)->inicio->abajo->inicio;
+				(*raiz)->inicio->abajo=(*raiz)->inicio->abajo->ant;
+			}
 			bnd=1;
-			//modificar_clave(&(*aux_mayor)->sig,id);
 		}
 	if(bnd==0)
 		insertar_claves_en_pag(&(*raiz)->inicio,id);
@@ -293,6 +293,7 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 	return 1;
     }
 }
+
 void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una pagina
 {
 	if(inicio)

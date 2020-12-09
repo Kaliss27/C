@@ -19,6 +19,7 @@ typedef struct claves_en_paginas // Estructura para almacenar los datos contenid
 	int clv;
 	datos *datos_alm;
 	struct claves_en_paginas *sig;
+	struct claves_en_paginas *ant; //Lista doble enlazada
 	struct pagina *abajo;
 }clave;
 
@@ -35,24 +36,29 @@ page *crear_pagina(int d);
 page *crear_pagina_p(); 
 clave *crear_clave(int d);
 datos *crear_datos(int d);
-void ver_claves_en_pag(clave *inicio);
+void ver_claves_en_pag(clave *inicio); 
 void insertar_claves_en_pag(clave **raiz_p,int d);
 int calcular_m(clave *raiz);
 clave ** clave_centro(clave **raiz, int c);
-clave *crear_pag_izq();
+clave *crear_pag_izq(); //*
 void modificar_clave(clave **clv,int aux);
 void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo);
 clave **buscar_clave(page  **raiz,int id_b);
 clave **buscar_clave_en_pag(clave **inicio,int id_b);
+//****Fuciones para relizar el metodo bubblesort para ordenar las claves en una pagina
+void bubble_sort(clave **inicio); 
+void swap(clave **aux1,clave **aux2,clave **new_f);
+int count_elem(clave *inicio,int c);
+void ordenamiento(clave **inicio,int n_elem);
 
 int main(int argc, char const *argv[])
 {
 	page *raiz=NULL;
+	insercion(&raiz,18);
 	insercion(&raiz,35);
+	insercion(&raiz,7);
 	insercion(&raiz,30);
 	insercion(&raiz,27);
-	insercion(&raiz,18);
-	insercion(&raiz,7);
 	ver_claves_en_pag(raiz->ant->inicio);
     printf("\t");
     ver_claves_en_pag(raiz->inicio);
@@ -60,7 +66,7 @@ int main(int argc, char const *argv[])
     clave *aux=raiz->inicio;
     ver_claves_en_pag(aux->abajo->inicio);
     printf("\n");
-    int b=33;
+    int b=35;
     if(buscar_clave(&raiz,b))
     	printf("%i Encontrado\n",b);
     else
@@ -87,6 +93,7 @@ clave *crear_clave(int d) //Aloja espacio de memoria para almacenar las claves a
 	newe->datos_alm=crear_datos(d);
 	newe->abajo=NULL;
 	newe->sig=NULL;
+	newe->ant=NULL;
 	return newe;
 }
 
@@ -129,6 +136,10 @@ void insertar_claves_en_pag(clave **raiz_p,int d) // Interta claves en una pagin
 	if(!(*raiz_p))
 		return;
 	clave *newe=crear_clave(d);
+	if(!(*raiz_p))
+		newe->ant=(*raiz_p);
+	else
+		(*raiz_p)->ant=newe;
 	newe->sig=(*raiz_p);
 	(*raiz_p)=newe;
 	return;
@@ -189,11 +200,11 @@ clave **buscar_clave(page  **raiz,int id_b) //Busca la clave en todo el arbol, d
 	else
 		return NULL;
 }
-
 void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o no hoja
 {
 	(*clv)->clv=aux;
 	(*clv)->sig=NULL;
+	(*clv)->ant=NULL;
 	(*clv)->datos_alm=NULL;
 	return;
 }
@@ -203,6 +214,7 @@ void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Pa
 	(*ant)->inicio=(*raiz)->inicio;											// el puntero "abajo" de cada elemento de la pagina
 	(*raiz)->ant=(*ant);
 	aux_c->abajo=(*abajo);
+	(*centro)->ant=NULL;
 	modificar_clave(&aux_c,(*centro)->clv);
 	(*abajo)->inicio=(*centro);
 	(*raiz)->inicio=aux_c;
@@ -219,6 +231,7 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 			return 1;
 	}
 	insertar_claves_en_pag(&(*raiz)->inicio,id);
+	ordenamiento(&(*raiz)->inicio,count_elem((*raiz)->inicio,0)+1);
 	if(calcular_m((*raiz)->inicio) > 2*D)
 	{
 		clave **centro=clave_centro(&(*raiz)->inicio,0);
@@ -238,4 +251,67 @@ void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una 
 		ver_claves_en_pag(inicio->sig);
 	}
 	return;
+}
+//******Ordena claves en una pagina
+int count_elem(clave *inicio,int c)
+{
+	if(!inicio)
+		return c;
+	c++;
+	return count_elem(inicio->sig,c);
+}
+void swap(clave **aux1,clave **aux2,clave **new_f)
+{
+	clave *aux=(*aux1);
+	clave *auxx=(*aux1)->ant;
+
+	(*aux1)=(*aux2);
+	(*aux2)=aux;
+	(*aux1)->ant=(*aux2)->ant;
+	(*aux2)->ant=(*aux1);
+	(*aux2)->sig=(*aux1)->sig;
+
+	(*aux1)->sig=(*aux2);
+
+	aux=(*aux2)->sig;
+	if(aux)     //Verifica si se cambia con el ultimo elemento de la lista
+		aux->ant=(*aux2);
+
+	if(auxx)    //Verifica si se cambia con el primer elemento de la lista
+	{
+		auxx->sig=(*aux1);
+	}
+
+	if(!(*aux1)->ant)  //Modifica el puntero a inicio de la lista, en caso de que el primer elemento haya cambiado
+		(*new_f)=(*aux1);
+
+	return;
+}
+
+void bubble_sort(clave **inicio) 
+{
+	if (!(*inicio))
+	{
+		return;
+	}
+	clave *actual,*siguiente;
+	actual=(*inicio);
+	siguiente=(*inicio)->sig;
+	
+	while(siguiente)
+	{
+		if(actual->clv > siguiente->clv)
+			swap(&actual,&siguiente,inicio);
+		actual=siguiente;
+	    siguiente=siguiente->sig;
+	}
+	bubble_sort(&(*inicio)->sig);
+	return;
+}
+void ordenamiento(clave **inicio,int n_elem)
+{
+	for(int i=0;i<n_elem;i++)
+	{
+		bubble_sort(inicio);
+	}
 }

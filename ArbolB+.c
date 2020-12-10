@@ -257,7 +257,23 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 			return 1;
 	}
 	if((*raiz)->ant && id<(*raiz)->inicio->clv) //Verifica si existen paginas anteriores y corrobora que el numero a insertar sea menor
-		return insercion(&(*raiz)->ant,id);     //inicial de la pagina
+	{
+		insercion(&(*raiz)->ant,id);     //inicial de la pagina
+		if((*raiz)->ant->ant)
+		{
+			clave *axx1=(*raiz)->ant->inicio; // 7
+			page *axx_a=(*raiz)->ant->ant; //2
+
+			(*raiz)->inicio->ant=axx1;
+			axx1->sig=(*raiz)->inicio;
+			(*raiz)->inicio=axx1;
+
+			(*raiz)->ant=axx_a;
+			return 1;
+
+		}
+		return 1;
+	}
 	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
 	int bnd=0;
 	if(aux_mayor && ((*aux_mayor)->abajo))

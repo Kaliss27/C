@@ -56,21 +56,22 @@ int main(int argc, char const *argv[])
 {
 	page *raiz=NULL;
 	insercion(&raiz,18);
-	insercion(&raiz,35);
+	insercion(&raiz,35);//*
 	insercion(&raiz,7);
 	insercion(&raiz,30);
 	insercion(&raiz,27);// 7-18-27-30-35 --> 7-18 || 27 ||27-30-35 
 	insercion(&raiz,5);
-	insercion(&raiz,32);
+	insercion(&raiz,32);//*
 	insercion(&raiz,9);
 	insercion(&raiz,31);
 	insercion(&raiz,2); //2-5-7-9-18 || 27 || 27-30-31-32-35  
 	insercion(&raiz,3);
 	insercion(&raiz,10);
-	insercion(&raiz,25);
-	//insercion(&raiz,40);
+	insercion(&raiz,25);//*
+	insercion(&raiz,40);//*
+	//insercion(&raiz,43);
     printf("\n");
-    int b=35;
+    int b=40;
     if(buscar_clave(&raiz,b))
     	printf("%i Encontrado\n",b);
     else
@@ -187,7 +188,7 @@ clave **buscar_clave_mayor(clave **inicio,int id_b)
 	}
 	if(((*inicio)->clv < id_b) && (aux->clv > id_b))
 		return inicio;
-	return buscar_clave_en_pag(&(*inicio)->sig,id_b);
+	return buscar_clave_mayor(&(*inicio)->sig,id_b);
 }
 
 clave **buscar_clave_en_pag(clave **inicio,int id_b) //Busca una clave dentro de una pagina dada
@@ -254,11 +255,9 @@ void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Pa
 }
 void acomodar_clave(clave **e_clave,page *e_page,clave **e_clnew)
 {
-	printf("eeeei\n");
 	clave *aux=(*e_clave)->sig;
 	if(((*e_clave)->sig) && (aux->ant))
 	{
-		printf("eee\n");
 		(*e_clnew)->ant=(*e_clave);
 		(*e_clnew)->sig=aux;
 		aux->ant=(*e_clnew);
@@ -267,14 +266,16 @@ void acomodar_clave(clave **e_clave,page *e_page,clave **e_clnew)
 	{
 		if((*e_clave)->ant)
 			{
-				printf("ant\n");
 				(*e_clnew)->ant=(*e_clave);
 			}
 		else
 			if((*e_clave)->sig)
 				{
-					printf("sig\n");
 					(*e_clnew)->sig=aux;
+				}
+				else
+				{
+					(*e_clnew)->ant=(*e_clave);
 				}
 	}
 	(*e_clave)->sig=e_page->inicio;
@@ -308,6 +309,8 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		return 1;
 	}
 	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
+	if(aux_mayor)
+		printf("innn m:%i\n%i\n",(*aux_mayor)->clv,id);
 	int bnd=0;
 	if(aux_mayor && ((*aux_mayor)->abajo))
 		{

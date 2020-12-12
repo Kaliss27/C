@@ -59,12 +59,12 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,35);
 	insercion(&raiz,7);
 	insercion(&raiz,30);
-	insercion(&raiz,27);
+	insercion(&raiz,27);// 7-18-27-30-35 --> 7-18 || 27 ||27-30-35 
 	insercion(&raiz,5);
 	insercion(&raiz,32);
 	insercion(&raiz,9);
 	insercion(&raiz,31);
-	insercion(&raiz,2);
+	insercion(&raiz,2); //2-5-7-9-18 || 27 || 27-30-31-32-35  
 	insercion(&raiz,3);
 	insercion(&raiz,10);
 	insercion(&raiz,25);
@@ -254,7 +254,29 @@ void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Pa
 }
 void acomodar_clave(clave **e_clave,page *e_page,clave **e_clnew)
 {
-	(*e_clnew)->ant=(*e_clave);
+	printf("eeeei\n");
+	clave *aux=(*e_clave)->sig;
+	if(((*e_clave)->sig) && (aux->ant))
+	{
+		printf("eee\n");
+		(*e_clnew)->ant=(*e_clave);
+		(*e_clnew)->sig=aux;
+		aux->ant=(*e_clnew);
+	}
+	else
+	{
+		if((*e_clave)->ant)
+			{
+				printf("ant\n");
+				(*e_clnew)->ant=(*e_clave);
+			}
+		else
+			if((*e_clave)->sig)
+				{
+					printf("sig\n");
+					(*e_clnew)->sig=aux;
+				}
+	}
 	(*e_clave)->sig=e_page->inicio;
 	(*e_clave)->abajo=e_page->ant;
 	return;
@@ -272,8 +294,8 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		insercion(&(*raiz)->ant,id);     //inicial de la pagina
 		if((*raiz)->ant->ant)
 		{
-			clave *axx1=(*raiz)->ant->inicio; // 7
-			page *axx_a=(*raiz)->ant->ant; //2
+			clave *axx1=(*raiz)->ant->inicio; 
+			page *axx_a=(*raiz)->ant->ant; 
 
 			(*raiz)->inicio->ant=axx1;
 			axx1->sig=(*raiz)->inicio;
@@ -286,15 +308,13 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		return 1;
 	}
 	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
-	if(aux_mayor)
-		printf("%i\nid:%i\n",(*aux_mayor)->clv,id);
 	int bnd=0;
 	if(aux_mayor && ((*aux_mayor)->abajo))
 		{
 			insercion(&(*aux_mayor)->abajo,id); //Inserta sin llevarse arriba a otra clave..
-			if((*raiz)->inicio->abajo->ant)
+			if((*aux_mayor)->abajo->ant)
 			{
-				clave *aux_cl=(*raiz)->inicio;
+				clave *aux_cl=(*aux_mayor);
 				page *aux_pg1=aux_cl->abajo;
 				acomodar_clave(&aux_cl,aux_cl->abajo,&aux_pg1->inicio); //Lleva arriba una clave
 			}

@@ -65,6 +65,10 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,9);
 	insercion(&raiz,31);
 	insercion(&raiz,2);
+	insercion(&raiz,3);
+	insercion(&raiz,10);
+	insercion(&raiz,25);
+	//insercion(&raiz,40);
     printf("\n");
     int b=35;
     if(buscar_clave(&raiz,b))
@@ -174,7 +178,14 @@ clave **buscar_clave_mayor(clave **inicio,int id_b)
 {
 	if(!(*inicio))
 		return NULL;
-	if((*inicio)->clv < id_b)
+	clave *aux=(*inicio)->sig;
+	if(!aux)
+	{
+		if((*inicio)->clv < id_b)
+			return inicio;
+		return  buscar_clave_en_pag(&(*inicio)->sig,id_b);
+	}
+	if(((*inicio)->clv < id_b) && (aux->clv > id_b))
 		return inicio;
 	return buscar_clave_en_pag(&(*inicio)->sig,id_b);
 }
@@ -275,6 +286,8 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		return 1;
 	}
 	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
+	if(aux_mayor)
+		printf("%i\nid:%i\n",(*aux_mayor)->clv,id);
 	int bnd=0;
 	if(aux_mayor && ((*aux_mayor)->abajo))
 		{

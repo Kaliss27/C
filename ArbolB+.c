@@ -56,20 +56,22 @@ int main(int argc, char const *argv[])
 {
 	page *raiz=NULL;
 	insercion(&raiz,10);
-	insercion(&raiz,27);//*
-	insercion(&raiz,29);
-	insercion(&raiz,17);
-	insercion(&raiz,25);// 7-18-27-30-35 --> 7-18 || 27 ||27-30-35 
+	insercion(&raiz,27);
+	insercion(&raiz,53);
+	insercion(&raiz,68);
+	insercion(&raiz,80);
+	insercion(&raiz,43);
 	insercion(&raiz,21);
-	insercion(&raiz,15);//*
-	insercion(&raiz,31);
-	insercion(&raiz,13);
-	insercion(&raiz,51); //2-5-7-9-18 || 27 || 27-30-31-32-35  
-	insercion(&raiz,20);
-	insercion(&raiz,24);
-	insercion(&raiz,48);//*
-	insercion(&raiz,19);//*
-	insercion(&raiz,60);
+	insercion(&raiz,77);
+	insercion(&raiz,58);
+	insercion(&raiz,63);
+	insercion(&raiz,15);
+	insercion(&raiz,37);
+	insercion(&raiz,41);
+	insercion(&raiz,72);
+	insercion(&raiz,39); 
+	insercion(&raiz,95);
+	insercion(&raiz,70);
     printf("\n");
     int b=40;
     if(buscar_clave(&raiz,b))
@@ -306,10 +308,11 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		if(raiz)
 			return 1;
 	}
+	int bnd2;
 	if((*raiz)->ant && id<(*raiz)->inicio->clv) //Verifica si existen paginas anteriores y corrobora que el numero a insertar sea menor
 	{
-		insercion(&(*raiz)->ant,id);     //inicial de la pagina
-		if((*raiz)->ant->ant)
+		bnd2=insercion(&(*raiz)->ant,id);     //inicial de la pagina
+		if((*raiz)->ant->ant && bnd2 == 2)
 		{
 			clave *axx1=(*raiz)->ant->inicio; 
 			page *axx_a=(*raiz)->ant->ant; 
@@ -325,13 +328,11 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		return 1;
 	}
 	clave **aux_mayor=buscar_clave_mayor(&(*raiz)->inicio,id);
-	if(aux_mayor)
-		printf("innn m:%i\n%i\n",(*aux_mayor)->clv,id);
 	int bnd=0;
 	if(aux_mayor && ((*aux_mayor)->abajo))
 		{
-			insercion(&(*aux_mayor)->abajo,id); //Inserta sin llevarse arriba a otra clave..
-			if((*aux_mayor)->abajo->ant)
+			bnd2=insercion(&(*aux_mayor)->abajo,id); //Inserta sin llevarse arriba a otra clave..
+			if((*aux_mayor)->abajo->ant && bnd2 == 2)
 			{
 				clave *aux_cl=(*aux_mayor);
 				page *aux_pg1=aux_cl->abajo;
@@ -350,8 +351,9 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 		if(!(n_ant || n_abajo))
 			return 0;
 		modificar_paginas(raiz,centro,&n_ant,&n_abajo); //Modifica la estructura del arbol.
-	return 1;
+	return 2; //Pagina llena
     }
+    return 1;
 }
 
 void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una pagina

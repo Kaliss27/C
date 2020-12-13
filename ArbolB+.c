@@ -72,8 +72,10 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,39); 
 	insercion(&raiz,95);
 	insercion(&raiz,70);
-    printf("\n");
-    int b=40;
+	insercion(&raiz,38);
+	insercion(&raiz,78);
+	insercion(&raiz,82);//
+    int b=50;
     if(buscar_clave(&raiz,b))
     	printf("%i Encontrado\n",b);
     else
@@ -209,28 +211,13 @@ clave **buscar_clave(page  **raiz,int id_b) //Busca la clave en todo el arbol, d
 		if(aux){
 			if(!((*raiz)->ant) && !((*aux)->abajo))
 				return aux;
-			page *aux_p=(*aux)->abajo;
-			return buscar_clave(&aux_p,id_b);
+			return buscar_clave(&(*aux)->abajo,id_b);
 		}
-		clave *aux_c=(*raiz)->inicio;
-		if(id_b < aux_c->clv)
-			return buscar_clave(&(*raiz)->ant,id_b);
-		clave *aux_c1=aux_c->sig;
-		if(!aux_c1)
-			{
-				if(id_b > aux_c->clv)
-				{
-					return buscar_clave(&aux_c->abajo,id_b);
-				}
-				return NULL;
-			}
-		if(aux_c->clv < id_b < aux_c1->clv)
-			return buscar_clave(&(*raiz)->inicio->abajo,id_b);
-		aux_c1=aux_c1->sig;
-		if(id_b > aux_c1->clv)
-			return buscar_clave(&aux_c1->abajo,id_b);
+		clave **aux_m=buscar_clave_mayor(&(*raiz)->inicio,id_b);
+		if(aux_m && (*aux_m)->abajo)
+			return buscar_clave(&(*aux_m)->abajo,id_b);
+		return buscar_clave(&(*raiz)->ant,id_b);
 	}
-	else
 		return NULL;
 }
 void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o no hoja

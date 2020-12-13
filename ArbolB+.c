@@ -55,21 +55,21 @@ void ordenamiento(clave **inicio,int n_elem);
 int main(int argc, char const *argv[])
 {
 	page *raiz=NULL;
-	insercion(&raiz,18);
-	insercion(&raiz,35);//*
-	insercion(&raiz,7);
-	insercion(&raiz,30);
-	insercion(&raiz,27);// 7-18-27-30-35 --> 7-18 || 27 ||27-30-35 
-	insercion(&raiz,5);
-	insercion(&raiz,32);//*
-	insercion(&raiz,9);
-	insercion(&raiz,31);
-	insercion(&raiz,2); //2-5-7-9-18 || 27 || 27-30-31-32-35  
-	insercion(&raiz,3);
 	insercion(&raiz,10);
-	insercion(&raiz,25);//*
-	insercion(&raiz,40);//*
-	//insercion(&raiz,43);
+	insercion(&raiz,27);//*
+	insercion(&raiz,29);
+	insercion(&raiz,17);
+	insercion(&raiz,25);// 7-18-27-30-35 --> 7-18 || 27 ||27-30-35 
+	insercion(&raiz,21);
+	insercion(&raiz,15);//*
+	insercion(&raiz,31);
+	insercion(&raiz,13);
+	insercion(&raiz,51); //2-5-7-9-18 || 27 || 27-30-31-32-35  
+	insercion(&raiz,20);
+	insercion(&raiz,24);
+	insercion(&raiz,48);//*
+	insercion(&raiz,19);//*
+	insercion(&raiz,60);
     printf("\n");
     int b=40;
     if(buscar_clave(&raiz,b))
@@ -241,13 +241,29 @@ void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o
 }
 void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Partir pagina...
 {        																	//Sube la clave central a la pagina antecesora
-	clave *aux_c=crear_pag_izq();											//Acomoda en puntero anterior de la pagina, y 
-	(*ant)->inicio=(*raiz)->inicio;											// el puntero "abajo" de cada elemento de la pagina
-	(*raiz)->ant=(*ant);
+	clave *aux_c=crear_pag_izq();	
+	clave *aux_c1=(*centro)->sig;
+	clave *aux_c2=(*centro)->ant;										//Acomoda en puntero anterior de la pagina, y 
+
+	(*ant)->inicio=(*raiz)->inicio;
+	if(!(*raiz)->ant)										// el puntero "abajo" de cada elemento de la pagina
+		(*raiz)->ant=(*ant);
+	else
+	{
+		(*ant)->ant=(*raiz)->ant;
+		(*raiz)->ant=(*ant);
+	}
 	aux_c->abajo=(*abajo);
 	(*centro)->ant=NULL;
 	modificar_clave(&aux_c,(*centro)->clv);
-	(*abajo)->inicio=(*centro);
+	if(!(*centro)->abajo)
+		(*abajo)->inicio=(*centro);
+	else
+		{
+			(*abajo)->ant=(*centro)->abajo;
+			(*abajo)->inicio=aux_c1;
+			aux_c1->ant=NULL;
+		}
 	(*raiz)->inicio=aux_c;
 	(*raiz)->inicio->abajo=(*abajo);
 	(*centro)=NULL;
@@ -256,7 +272,7 @@ void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo) // Pa
 void acomodar_clave(clave **e_clave,page *e_page,clave **e_clnew)
 {
 	clave *aux=(*e_clave)->sig;
-	if(((*e_clave)->sig) && (aux->ant))
+	if((aux) && (aux->ant))
 	{
 		(*e_clnew)->ant=(*e_clave);
 		(*e_clnew)->sig=aux;

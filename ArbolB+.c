@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,48);
 	insercion(&raiz,19);
 	insercion(&raiz,60); 
-	insercion(&raiz,35);
+	insercion(&raiz,45);
 	insercion(&raiz,66);
 	/*insercion(&raiz,38);
 	insercion(&raiz,78);
@@ -80,6 +80,7 @@ int main(int argc, char const *argv[])
 	eliminar(&raiz,15);
 	eliminar(&raiz,51);
 	eliminar(&raiz,48);
+	eliminar(&raiz,60);
 
     int b=50;
     if(buscar_clave(&raiz,b))
@@ -226,6 +227,27 @@ clave **buscar_clave(page  **raiz,int id_b) //Busca la clave en todo el arbol, d
 	}
 		return NULL;
 }
+
+clave **mas_der_rama_izq(clave **claves) //Busca clave mas a la derecha de una rama
+{
+	if(!(*claves)->sig)
+		return claves;
+	return mas_der_rama_izq(&(*claves)->sig);
+}
+
+clave **localizar_rama(clave **e_clave,int *m) // Localiza rama con m<d
+{
+	if(!(*e_clave))
+		return NULL;
+	*m=calcular_m((*e_clave)->abajo->inicio);
+	if(*m < D)
+	{
+		printf("m:%i\n",*m);
+		return e_clave;
+	}
+	return localizar_rama(&(*e_clave)->sig,m);
+}
+
 void modificar_clave(clave **clv,int aux) //Modifica claves de una pagina raiz o no hoja
 {
 	(*clv)->clv=aux;
@@ -382,13 +404,37 @@ int eliminar_camino(page **raiz,int id_b)
 		if(aux){
 			if(!((*raiz)->ant) && !((*aux)->abajo))
 				{
-					return eliminar_clave_p(&(*raiz)->inicio,id_b,0);
+					int d=eliminar_clave_p(&(*raiz)->inicio,id_b,0);
+					return 1;
+
 				}
 			return eliminar_camino(&(*aux)->abajo,id_b);
 		}
 		clave **aux_m=buscar_clave_mayor(&(*raiz)->inicio,id_b);
 		if(aux_m && (*aux_m)->abajo)
-			return eliminar_camino(&(*aux_m)->abajo,id_b);
+			{
+				eliminar_camino(&(*aux_m)->abajo,id_b);
+				int m=0;
+				clave **aux_m=localizar_rama(&(*raiz)->inicio,&m);
+				if(m<D)
+				{
+					clave **aux_c1=mas_der_rama_izq(&(*aux_m)->ant->abajo->inicio);
+					printf("aux_m:%i\naux_c1:%i\n",(*aux_m)->clv,(*aux_c1)->clv);
+					clave *aux_a1=(*aux_c1)->ant;
+					(*aux_c1)->sig=(*aux_m)->abajo->inicio;
+					(*aux_m)->abajo->inicio->ant=(*aux_c1);
+					(*aux_m)->abajo->inicio=(*aux_c1);
+					(*aux_m)->clv=(*aux_m)->abajo->inicio->clv;
+					aux_a1->sig=NULL;
+					return 1;
+				}
+				/*if(aux_m)
+					printf("%i\n",(*aux_m)->clv);
+				clave **aux_c1=mas_der_rama_izq(&(*aux_m)->ant->abajo->inicio);
+				if(aux_c1)
+					printf("sii\n");*/
+				return 1;
+			}
 		return eliminar_camino(&(*raiz)->ant,id_b);
 	}
 		return 0;

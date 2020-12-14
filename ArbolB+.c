@@ -46,6 +46,7 @@ void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo);
 clave **buscar_clave(page  **raiz,int id_b);
 clave **buscar_clave_en_pag(clave **inicio,int id_b);
 void subir_clave(clave **actual,clave *sig,page *abajo);
+void eliminar(page **raiz,int id_b);
 //****Fuciones para relizar el metodo bubblesort para ordenar las claves en una pagina
 void bubble_sort(clave **inicio); 
 void swap(clave **aux1,clave **aux2,clave **new_f);
@@ -57,24 +58,29 @@ int main(int argc, char const *argv[])
 	page *raiz=NULL;
 	insercion(&raiz,10);
 	insercion(&raiz,27);
-	insercion(&raiz,53);
-	insercion(&raiz,68);
-	insercion(&raiz,80);
-	insercion(&raiz,43);
+	insercion(&raiz,29);
+	insercion(&raiz,17);
+	insercion(&raiz,25);
 	insercion(&raiz,21);
-	insercion(&raiz,77);
-	insercion(&raiz,58);
-	insercion(&raiz,63);
 	insercion(&raiz,15);
-	insercion(&raiz,37);
-	insercion(&raiz,41);
-	insercion(&raiz,72);
-	insercion(&raiz,39); 
-	insercion(&raiz,95);
-	insercion(&raiz,70);
-	insercion(&raiz,38);
+	insercion(&raiz,31);
+	insercion(&raiz,13);
+	insercion(&raiz,51);
+	insercion(&raiz,20);
+	insercion(&raiz,24);
+	insercion(&raiz,48);
+	insercion(&raiz,19);
+	insercion(&raiz,60); 
+	insercion(&raiz,35);
+	insercion(&raiz,66);
+	/*insercion(&raiz,38);
 	insercion(&raiz,78);
-	insercion(&raiz,82);//
+	insercion(&raiz,82);/*/
+
+	eliminar(&raiz,15);
+	eliminar(&raiz,51);
+	eliminar(&raiz,48);
+
     int b=50;
     if(buscar_clave(&raiz,b))
     	printf("%i Encontrado\n",b);
@@ -342,6 +348,61 @@ int insercion(page **raiz,int id) // Operacion general de insercion
     }
     return 1;
 }
+
+int eliminar_clave_p(clave **e_clvp,int id_b,int bnd) //Elimina x clave de una pag
+{
+	printf("entra a eliminar_clave_p\n");
+	if(!(*e_clvp))
+		return 0;
+	clave *aux1;
+	if((*e_clvp)->clv == id_b)
+	{
+		if(!(*e_clvp)->ant)
+		{
+			aux1=(*e_clvp)->sig;
+			aux1->ant=NULL;
+		}
+		clave *aux2 = (*e_clvp);
+		(*e_clvp) = (*e_clvp)->sig;
+		free(aux2); 
+		bnd=1;
+		if((*e_clvp) == NULL){
+			return 1;
+		}
+    return eliminar_clave_p(&(*e_clvp)->sig,id_b,bnd);
+}
+return eliminar_clave_p(&(*e_clvp)->sig,id_b,bnd);
+}
+
+int eliminar_camino(page **raiz,int id_b)
+{
+	if((*raiz))
+	{
+		clave **aux=buscar_clave_en_pag(&(*raiz)->inicio,id_b);
+		if(aux){
+			if(!((*raiz)->ant) && !((*aux)->abajo))
+				{
+					return eliminar_clave_p(&(*raiz)->inicio,id_b,0);
+				}
+			return eliminar_camino(&(*aux)->abajo,id_b);
+		}
+		clave **aux_m=buscar_clave_mayor(&(*raiz)->inicio,id_b);
+		if(aux_m && (*aux_m)->abajo)
+			return eliminar_camino(&(*aux_m)->abajo,id_b);
+		return eliminar_camino(&(*raiz)->ant,id_b);
+	}
+		return 0;
+}
+
+void eliminar(page **raiz,int id_b)
+{
+	clave **clv_b=buscar_clave(raiz,id_b);
+	if(clv_b)
+	{
+		eliminar_camino(raiz,id_b);
+	}
+}
+
 
 void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una pagina
 {

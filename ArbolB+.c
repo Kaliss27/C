@@ -4,14 +4,24 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 #define D 2 
+#define tn 20
 
 /*Estructuras*/
 
 typedef struct datos_almacenados   //Estructura que almacenara los datos pertenecientes a cada clave
 {
 	int id;
+	char nombre_p[tn];
+	char apellido_pp[tn];
+	char apellido_pm[tn];
+	int edad;
+	char piso[tn];
+	int cama;
 }datos;
 
 typedef struct claves_en_paginas // Estructura para almacenar los datos contenidos por un elemento pagina
@@ -29,6 +39,7 @@ typedef struct pagina // Estructura para almacenar los distintos elementos pagin
 	struct pagina *ant;
 }page;
 
+
 /* Declaracion de Funciones*/
 
 int insercion(page **raiz,int id);
@@ -45,6 +56,7 @@ void modificar_clave(clave **clv,int aux);
 void modificar_paginas(page **raiz,clave **centro,page **ant,page **abajo);
 clave **buscar_clave(page  **raiz,int id_b);
 clave **buscar_clave_en_pag(clave **inicio,int id_b);
+void tiempo_busqueda(page **raiz,int b); 
 void subir_clave(clave **actual,clave *sig,page *abajo);
 void eliminar(page **raiz,int id_b);
 //****Fuciones para relizar el metodo bubblesort para ordenar las claves en una pagina
@@ -55,6 +67,7 @@ void ordenamiento(clave **inicio,int n_elem);
 
 int main(int argc, char const *argv[])
 {
+
 	page *raiz=NULL;
 	insercion(&raiz,10);
 	insercion(&raiz,27);
@@ -76,22 +89,19 @@ int main(int argc, char const *argv[])
 	/*insercion(&raiz,38);
 	insercion(&raiz,78);
 	insercion(&raiz,82);/*/
-
+/*
 	eliminar(&raiz,15);
 	eliminar(&raiz,51);
 	eliminar(&raiz,48);
 	eliminar(&raiz,60);
 	eliminar(&raiz,31);
 	eliminar(&raiz,17);
-	eliminar(&raiz,21);
+	eliminar(&raiz,21);*/
 	//eliminar(&raiz,19);
 	//eliminar(&raiz,13);
 
-    int b=50;
-    if(buscar_clave(&raiz,b))
-    	printf("%i Encontrado\n",b);
-    else
-    	printf("#%i no encontrado\n",b);
+    int b=27;
+    tiempo_busqueda(&raiz,b);
 	return 0;
 }
 /*Cuerpo de funciones*/
@@ -206,6 +216,39 @@ clave **buscar_clave_mayor(clave **inicio,int id_b)
 		return inicio;
 	return buscar_clave_mayor(&(*inicio)->sig,id_b);
 }
+/**/
+long long cronomsec(int startstop)
+{
+  static long long pre_time;
+  struct timeval tv;
+
+  if (startstop)
+    {
+      gettimeofday(&tv, NULL);      
+      pre_time=tv.tv_sec*1000+tv.tv_usec/1000;
+    }
+  else
+    {      
+      gettimeofday(&tv, NULL);      
+      return tv.tv_sec*1000+tv.tv_usec/1000 - pre_time;
+    }
+    return 0;
+}
+
+void tiempo_busqueda(page **raiz,int b) //REaliza la busqueda de una clave y mide el tiempo que se tarda en realizarla
+{
+	time_t start_t, end_t;
+	double total_t;
+	time(&start_t);
+	clave **aux=buscar_clave(raiz,b);
+	time(&end_t);
+	if(aux)
+    	printf("#%i Encontrado\n",b);
+    else
+    	printf("#%i no encontrado\n",b);
+    printf("Tiempo de busqueda:%lld mls\n",cronomsec(end_t-start_t));
+    return;
+}
 
 clave **buscar_clave_en_pag(clave **inicio,int id_b) //Busca una clave dentro de una pagina dada
 {
@@ -254,7 +297,6 @@ clave **localizar_rama(clave **e_clave,int *m) // Localiza rama con m<d
 	*m=calcular_m((*e_clave)->abajo->inicio);
 	if(*m < D)
 	{
-		printf("m:%i\n",*m);
 		return e_clave;
 	}
 	return localizar_rama(&(*e_clave)->sig,m);
@@ -385,7 +427,6 @@ int insercion(page **raiz,int id) // Operacion general de insercion
 
 int eliminar_clave_p(clave **e_clvp,int id_b,int bnd) //Elimina x clave de una pag
 {
-	printf("entra a eliminar_clave_p\n");
 	if(!(*e_clvp))
 		return 0;
 	clave *aux1;
@@ -434,9 +475,7 @@ int eliminar_camino(page **raiz,int id_b)
 					if(!(*aux_m)->sig)
 					{
 						aux_c1=mas_der_rama_izq(&(*aux_m)->ant->abajo->inicio);
-						printf("aux_m:%i\naux_c1:%i\n",(*aux_m)->clv,(*aux_c1)->clv);
 						clave *aux_a1=(*aux_c1)->ant;
-						//aux_a1->sig=NULL;
 						(*aux_c1)->sig=(*aux_m)->abajo->inicio;
 						(*aux_m)->abajo->inicio->ant=(*aux_c1);
 						(*aux_c1)->ant=NULL;
@@ -449,10 +488,7 @@ int eliminar_camino(page **raiz,int id_b)
 				    if((*aux_m)->sig)
 				    {
 				    	aux_c1=mas_izq_rama_der(&(*aux_m)->sig->abajo->inicio);
-				    	printf("aux_m:%i\naux_c1:%i\n",(*aux_m)->clv,(*aux_c1)->clv);
-
 				    	return 1;
-
 				    }
 				}
 				return 1;

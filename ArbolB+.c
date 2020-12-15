@@ -528,8 +528,7 @@ void eliminar(page **raiz,int id_b)
 		eliminar_camino(raiz,id_b);
 	}
 }
-
-
+//*****Ver Arbol B+*******
 void ver_claves_en_pag(clave *inicio,int c,int i) // VIsualiza las claves contenidas en una pagina
 {
 	if(inicio)
@@ -574,6 +573,8 @@ void ver_paginas(page *inicio_p,int c,int i)
 			ver_ramas(inicio_p->ant,c+1,0);
 		else
 			return ver_claves_en_pag(inicio_p->inicio,c+1,0);
+		if(i==0)
+			ver_ramas(inicio_p->inicio->abajo,c,0);
 	}
 }
 //******Ordena claves en una pagina

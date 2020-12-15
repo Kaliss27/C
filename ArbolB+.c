@@ -75,7 +75,7 @@ int main(int argc, char const *argv[])
 	insercion(&raiz,29);
 	insercion(&raiz,17);
 	insercion(&raiz,25);
-	insercion(&raiz,21);
+/*	insercion(&raiz,21);
 	insercion(&raiz,15);
 	insercion(&raiz,31);
 	insercion(&raiz,13);
@@ -535,7 +535,8 @@ void ver_claves_en_pag(clave *inicio,int c,int i) // VIsualiza las claves conten
 	{
 		for(i=0;i<c;i++)
 			printf(" ");
-		printf("|%i\n",inicio->clv);
+		datos *data_p=inicio->datos_alm;
+		printf("|%i - %s\n",inicio->clv,data_p->nombre_p);
 		ver_claves_en_pag(inicio->sig,c,i);
 	}
 	return;
@@ -546,14 +547,23 @@ void ver_ramas(page *rama,int c,int i)
 	if(rama)
 		if(rama->ant)
 		{
-			printf("|-");
-			ver_paginas(rama,c,0);
+			//printf("|_\n");
+			for(i=0;i<c;i++)
+				printf(" ");
+			printf("|_\n");
+			ver_paginas(rama,c+2,0);
 		}
 		else
 		{
-			ver_claves_en_pag(rama->inicio,c+1,0);
+			for(i=0;i<c;i++)
+				printf(" ");
+			printf("|_\n");
+			ver_claves_en_pag(rama->inicio,c+2,0);
+			return;
 		}
-		ver_paginas(rama->inicio->abajo,c+1,0);
+		page *aux_p=rama->inicio->abajo;
+		if(aux_p)
+			ver_paginas(rama->inicio->abajo,c+1,0);
 		clave *aux=rama->inicio->sig;
 		if(aux)
 			ver_paginas(aux->abajo,c,0);
@@ -564,17 +574,20 @@ void ver_paginas(page *inicio_p,int c,int i)
 {
 	if(inicio_p)
 	{
+		printf("|_\n");
 		for(i=0;i<c;i++)
 		{
 			printf(" ");
 		}
-		printf("|\n");
 		if(inicio_p->ant)
-			ver_ramas(inicio_p->ant,c+1,0);
-		else
-			return ver_claves_en_pag(inicio_p->inicio,c+1,0);
+			ver_ramas(inicio_p->ant,c+2,0);
+		else{
+			printf("|_\n");
+			return ver_claves_en_pag(inicio_p->inicio,c+2,0);
+		}
 		if(i==0)
-			ver_ramas(inicio_p->inicio->abajo,c,0);
+			ver_paginas(inicio_p->inicio->abajo,c+2,0);
+		return;
 	}
 }
 //******Ordena claves en una pagina

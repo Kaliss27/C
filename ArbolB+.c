@@ -47,8 +47,9 @@ page *crear_pagina(int d);
 page *crear_pagina_p(); 
 clave *crear_clave(int d);
 datos *crear_datos(int d);
-void ver_claves_en_pag(clave *inicio); 
+void ver_claves_en_pag(clave *inicio,int c,int i); 
 void insertar_claves_en_pag(clave **raiz_p,int d);
+void ver_paginas(page *inicio_p,int c,int i);
 int calcular_m(clave *raiz);
 clave ** clave_centro(clave **raiz, int c);
 clave *crear_pag_izq(); //*
@@ -102,6 +103,8 @@ int main(int argc, char const *argv[])
 
     int b=27;
     tiempo_busqueda(&raiz,b);
+
+    ver_paginas(raiz,0,0);
 	return 0;
 }
 /*Cuerpo de funciones*/
@@ -111,7 +114,26 @@ datos *crear_datos(int d)  //Aloja espacio de memoria para los datos a almacenar
 	datos *newe=(datos*)malloc(sizeof(datos));
 	if(!newe)
 		return NULL;
+	//fflush(stdin);
 	newe->id=d;
+	/*printf("Nombre del paciente:\n");
+	scanf("%s",newe->nombre_p);
+	//fflush(stdin);
+	printf("Apellido Paterno:\n");
+	scanf("%s",newe->apellido_pp);
+	//fflush(stdin);
+	printf("Apellido Materno:\n");
+	scanf("%s",newe->apellido_pm);
+	//fflush(stdin);
+	printf("Edad:\n");
+	scanf("%i",&newe->edad);
+	//fflush(stdin);
+	printf("Piso:\n");
+	scanf("%s",newe->piso);
+	//fflush(stdin);
+	printf("Cama:\n");
+	scanf("%i",&newe->cama);*/
+	//fflush(stdin);
 	return newe;
 }
 
@@ -508,14 +530,51 @@ void eliminar(page **raiz,int id_b)
 }
 
 
-void ver_claves_en_pag(clave *inicio) // VIsualiza las claves contenidas en una pagina
+void ver_claves_en_pag(clave *inicio,int c,int i) // VIsualiza las claves contenidas en una pagina
 {
 	if(inicio)
 	{
-		printf("|%i",inicio->clv);
-		ver_claves_en_pag(inicio->sig);
+		for(i=0;i<c;i++)
+			printf(" ");
+		printf("|%i\n",inicio->clv);
+		ver_claves_en_pag(inicio->sig,c,i);
 	}
 	return;
+}
+
+void ver_ramas(page *rama,int c,int i)
+{
+	if(rama)
+		if(rama->ant)
+		{
+			printf("|-");
+			ver_paginas(rama,c,0);
+		}
+		else
+		{
+			ver_claves_en_pag(rama->inicio,c+1,0);
+		}
+		ver_paginas(rama->inicio->abajo,c+1,0);
+		clave *aux=rama->inicio->sig;
+		if(aux)
+			ver_paginas(aux->abajo,c,0);
+		return;
+}
+
+void ver_paginas(page *inicio_p,int c,int i)
+{
+	if(inicio_p)
+	{
+		for(i=0;i<c;i++)
+		{
+			printf(" ");
+		}
+		printf("|\n");
+		if(inicio_p->ant)
+			ver_ramas(inicio_p->ant,c+1,0);
+		else
+			return ver_claves_en_pag(inicio_p->inicio,c+1,0);
+	}
 }
 //******Ordena claves en una pagina
 int count_elem(clave *inicio,int c)

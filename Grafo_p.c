@@ -50,24 +50,15 @@ int leer_datos_archivo(FILE *archivo,char *p);// Lee datos de un archivo, para l
 int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un grafo
 void transformar(char *dato);
 
-
-/**Declaración de funciones para dibujar*/
-void reshape_cb (int w, int h);
-void display_cb();
-void initialize();
-void dibujar_letras_encabezado(char *s);
-
-/**Declaración de variables globales*/
-char texto_menu_enc[50],nombre_archivo[50];
 int m; // Total de palabras contenidas en un texto
 
 /**Función Main*/
 int main (int argc, char **argv)
 {
-	glutInit (&argc, argv);
-	initialize();
-	//glutIdleFunc(refresh);
-	glutMainLoop();
+	p_Cola *G;
+	crear_cola(&G);
+	cargar_grafo(&G,"Lorem_ipsun.txt",1);
+	//cargar_grafo(&G,"Lorem_ipsun.txt",1);
 	return 0;
 }
 /**Definición de funciones para grafos*/
@@ -297,77 +288,3 @@ void crear_cola(p_Cola **cola)
 
 //
 
-
-
-/**Definición de funciones para dibujar*/
-void reshape_cb (int w, int h) {
-	if (w==0||h==0) return;
-	glViewport(0,0,w,h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluOrtho2D(0,w,0,h);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-}
-
-void display_cb() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3d(1,1,1);
-	glPushMatrix();
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluOrtho2D (0,1000,1000,0);
-	
-	glColor3d(0.372549,0.623529,0.623529);	//CadetBlue
-	glBegin (GL_QUADS);
-	glVertex2f(0,0);
-	glVertex2f(1000,0);
-	glVertex2f(1000,100);
-	glVertex2f(0,100);	
-	glEnd();
-	
-	
-	glColor3d(1,1,1);
-	glRasterPos2f(491.0f,20.0f);
-	sprintf(texto_menu_enc,"Controles");
-	dibujar_letras_encabezado(texto_menu_enc);
-	
-	
-	glColor3d(1,1,1);
-	glRasterPos2f(30.0f,30.0f);
-	sprintf(texto_menu_enc,"Menu de funciones -> Click izquierdo ");
-	dibujar_letras_encabezado(texto_menu_enc);
-	
-	glColor3d(1,1,1);
-	glRasterPos2f(30.0f,50.0f);
-	sprintf(texto_menu_enc,"Moverse -> Teclas de direccion");
-	dibujar_letras_encabezado(texto_menu_enc);
-
-	
-	glPopMatrix();
-	glutSwapBuffers();
-}
-
-void initialize() {
-	glutInitDisplayMode (GLUT_RGBA|GLUT_DOUBLE);
-	glutInitWindowSize (1000,1000);
-	glutInitWindowPosition (0,0);
-	glutCreateWindow ("Proyecto 2- El predictor");
-	glutDisplayFunc (display_cb);
-	glutReshapeFunc (reshape_cb);
-	glClearColor(0.0,0.0,0.0,0.0);	
-	glutCreateMenu(0);
-	glutAddMenuEntry("Anexar nuevo archivo de texto",1);
-	glutAddMenuEntry("Insertar nueva frase",2);
-	glutAddMenuEntry("Frases frecuentes",3);
-	glutAddMenuEntry("Eliminar grafo",4);
-	glutAttachMenu(GLUT_LEFT_BUTTON);
-
-}
-
-
-void dibujar_letras_encabezado(char *s){
-	glColor3f(0.0f,0.0f,1.0f);
-	for(unsigned int i=0;i<strlen(s);i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,s[i]);
-}

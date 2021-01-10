@@ -58,6 +58,7 @@ int main (int argc, char **argv)
 	p_Cola *G;
 	crear_cola(&G);
 	cargar_grafo(&G,"Lorem_ipsun.txt",1);
+	ver_vertices(G->frente);
 	//cargar_grafo(&G,"Lorem_ipsun.txt",1);
 	return 0;
 }
@@ -142,6 +143,17 @@ vertice **buscar_vertice(vertice **V,char *word_b)
 	else return NULL;
 }
 
+arista **buscar_arista(arista **A,vertice *V_d)
+{
+	if((*A))
+	{
+		if((*A)->destino == V_d)
+			return A;
+		else buscar_arista(&(*A)->sig,V_d);
+	}
+	else return NULL;
+}
+
 int crear_arco(vertice *V_d,arista **a)
 {
 	arista *newe=(arista*)malloc(sizeof(arista));
@@ -149,6 +161,7 @@ int crear_arco(vertice *V_d,arista **a)
 		return 0;
 	newe->destino=V_d;
 	newe->sig=(*a);
+	newe->peso=1.0;
 	(*a)=newe;
 	return 1;
 }
@@ -157,12 +170,20 @@ int crear_conexiones(p_Cola **G,char *A,char *B)
 {
 	vertice **V_o=buscar_vertice(&(*G)->frente,A);
 	vertice **V_d=buscar_vertice(&(*G)->frente,B);
-	if(V_o && V_d)
+
+	arista **conexion=buscar_arista(&(*V_o)->lista_c,(*V_d));
+
+	if(!conexion)
 	{
 		int bnd=crear_arco((*V_d),&(*V_o)->lista_c);
 		if(bnd==1)
-			return 1;
+			return 1; // 1-> se creo nuevo arco
 		else return 0;
+	}
+	else
+	{
+		(*conexion)->peso++;
+		return 2; // 2-> Ya existia conexiòn, se agrego una unidad al peso
 	}
 	return 0;
 }
@@ -257,7 +278,7 @@ void ver_vertices(vertice *vertices)
 {
 	if(vertices)
 	{
-		//printf("|%c|->",vertices->clv);
+		printf("|%s|->",vertices->palabra);
 		ver_arcos(vertices->lista_c);
 		printf("\n");
 		ver_vertices(vertices->enl_sig);
@@ -267,14 +288,14 @@ void ver_vertices(vertice *vertices)
 
 void ver_arcos(arista *a)
 {
-	/*if(a)
+	if(a)
 	{
 	if(!a->sig)
-	printf("[%c]",a->destino->clv);
+	printf("[%s]",a->destino->palabra);
 	else
-	printf("[%c]-",a->destino->clv);
+	printf("[%s]-",a->destino->palabra);
 	ver_arcos(a->sig);
-}*/
+}
 	return;
 	
 }

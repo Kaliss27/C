@@ -50,7 +50,7 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un
 void transformar(char *dato);
 void probabilidad_ocurrencia(vertice **N); //Calcula la probabilidad de ocurrencia de una palabra
 void contar_vertices(vertice *V);
-
+void calculos(p_Cola **G);
 
 /**Declaración de funciones para dibujar*/
 void reshape_cb (int w, int h);
@@ -191,6 +191,7 @@ int crear_arco(vertice *V_d,arista **a)
 	newe->destino=V_d;
 	newe->sig=(*a);
 	newe->peso=1.0;
+	newe->costo=0.0;
 	(*a)=newe;
 	return 1;
 }
@@ -274,7 +275,7 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 		}
 	}
 	fclose(file_r);
-	printf("\n\ntotal de palabras: %d\n",m);
+	printf("\n\nTotal de palabras: %d\n",m);
 	return 1;
 }
 
@@ -282,6 +283,7 @@ void probabilidad_ocurrencia(vertice **N)
 {
 	if((*N))
 	{
+		//printf("d:%f  m:%i\n",(*N)->d,m);
 		(*N)->PA=(float)(((*N)->d)/m);
 		return probabilidad_ocurrencia(&(*N)->enl_sig);
 	}
@@ -348,7 +350,7 @@ void crear_cola(p_Cola **cola)
 	newe->frente=NULL;
 	newe->final=NULL;
 	(*cola)=newe;
-	printf("cola iniciada\n");
+	//printf("cola iniciada\n");
 	return;
 }
 
@@ -362,11 +364,13 @@ void contar_vertices(vertice *V){
 	contar_vertices(V->enl_sig);
 }
 
-
+void calculos(p_Cola **G)
+{
+	probabilidad_ocurrencia(&(*G)->frente);
+}
 /**Definición de funciones para dibujar*/
 
 void initialize() {
-	//crear_cola(&Grafo);
 	glutInitWindowSize (1000,1000);
 	glutInitWindowPosition (0,0);
 
@@ -384,10 +388,10 @@ void initialize() {
 	glutSpecialFunc(navegacion);
 	if(start)
 	{
-		//printf("inicioooo\n");
 		crear_cola(&Grafo);
 		cargar_grafo(&Grafo,"Grafo_completo.txt",0);
 		ver_vertices(Grafo->frente);
+		calculos(&Grafo);
 		start=0;
 	}
 
@@ -413,7 +417,6 @@ void display_cb() {
 	gluOrtho2D (0,1000,1000,0);
 	
 	contar_vertices(Grafo->frente);
-	//printf("%s\n", );
 	posiciones_vertices(Grafo->frente,x,y,1);
 	dibujar_conexiones(Grafo->frente);
 	dibujar_vertices(Grafo->frente);
@@ -510,12 +513,12 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 		glVertex2f(A_d->destino->c_x,A_d->destino->c_y);
 	glEnd();
 
-	glColor3d(1,0,0.5);
+	glColor3d(0.0f, 1.0f, 0.0f);
 	glRasterPos2f((V_o->c_x+A_d->destino->c_x)/2,(V_o->c_y+A_d->destino->c_y)/2);
-	sprintf(encabezado,"%f",A_d->costo);
+	sprintf(encabezado,"%6.5f",A_d->costo);
 	indices(encabezado);
 
-	glPointSize(10);
+	/*glPointSize(10);
 	glColor3d(1,1,0);
 	glBegin(GL_POINTS);
 	glVertex2f((V_o->c_x+4*A_d->destino->c_x)/(5),(V_o->c_y+4*A_d->destino->c_y)/(5));
@@ -525,12 +528,7 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 	glColor3d(1,0,0);
 	glBegin(GL_POINTS);
 	glVertex2f((4*V_o->c_x+A_d->destino->c_x)/(5),(4*V_o->c_y+A_d->destino->c_y)/(5));
-	glEnd();
-
-	// (origen->x+8*destino->p_vertice->x)/(9)
-	// (origen->y+8*destino->p_vertice->y)/(9)
-
-
+	glEnd();*/
 
 	dibujar_aristas(V_o,A_d->sig);
 }
@@ -549,14 +547,14 @@ void dibujar_vertices(vertice *V){
 	}
 	glEnd();
 
-	glColor3d(1,1,1);
+	glColor3d(0.0f, 0.1f, 0.1f);
 	glRasterPos2f(V->c_x-(tam/10),V->c_y);
 	sprintf(encabezado,"%s",V->palabra);
 	dibujar_letras(encabezado,2);
 
 	glColor3d(1,1,1);
 	glRasterPos2f(V->c_x-(tam/10),V->c_y+(tam/12));
-	sprintf(encabezado,"%f",V->PA);
+	sprintf(encabezado,"%.5f",V->PA);
 	dibujar_letras(encabezado,2);
 	dibujar_vertices(V->enl_sig);
 }

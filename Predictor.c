@@ -358,7 +358,6 @@ void crear_cola(p_Cola **cola)
 void contar_vertices(vertice *V){
 	if(!V){
 		espacio=(int)sqrt(espacio);
-		printf("%i\n",espacio);
 		return;
 	}
 	espacio++;
@@ -400,7 +399,6 @@ void eliminar_grafo(vertice **G)
 void initialize() {
 	glutInitWindowSize (1000,1000);
 	glutInitWindowPosition (0,0);
-
 	glutInitDisplayMode (GLUT_RGBA|GLUT_DOUBLE);
 	pos_v=glutCreateWindow ("Proyecto 2- El predictor");
 	glutReshapeFunc (resize);
@@ -418,7 +416,6 @@ void initialize() {
 		crear_cola(&Grafo);
 		cargar_grafo(&Grafo,"Grafo_completo.txt",0);
 		ver_vertices(Grafo->frente);
-		//calculos(&Grafo);
 		start=0;
 	}
 
@@ -553,8 +550,8 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 
 	glColor3d(0.0f, 1.0f, 0.0f); //Verde
 	glRasterPos2f((V_o->c_x+A_d->destino->c_x)/2,(V_o->c_y+A_d->destino->c_y)/2);
-	//sprintf(encabezado,"%6.7f",A_d->costo);
-	sprintf(encabezado,"%6.7f",A_d->peso);
+	sprintf(encabezado,"%6.7f",A_d->costo);
+	//sprintf(encabezado,"%6.7f",A_d->peso);
 	dibujar_letras(encabezado,3);
 
 	glPointSize(10);
@@ -617,7 +614,6 @@ void Menu(int opc){
 	}
 	switch(opc){
 		case 1:
-		printf("Opcion 1 menu\n");
 			sv= glutCreateSubWindow(pos_v,0,650,1520,100);
 			glutKeyboardFunc(input_teclado);
 			glutDisplayFunc(display_nuevo_archivo);

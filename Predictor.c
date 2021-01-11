@@ -585,7 +585,6 @@ void dibujar_vertices(vertice *V){
 	glLoadIdentity ();
 }*/
 
-
 void Menu(int opc){
 	if(sv!=0){
 		posicion=0; campo=1; leer_archivo=2;

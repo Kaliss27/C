@@ -51,6 +51,8 @@ void transformar(char *dato);
 void probabilidad_ocurrencia(vertice **N); //Calcula la probabilidad de ocurrencia de una palabra
 void contar_vertices(vertice *V);
 void calculos(p_Cola **G);
+void eliminar_aristas(arista **A);
+void eliminar_grafo(vertice **G);
 
 /**Declaración de funciones para dibujar*/
 void reshape_cb (int w, int h);
@@ -64,26 +66,24 @@ void dibujar_vertices(vertice *V);
 static void resize(int width, int height);
 void dibujar_conexiones(vertice *raiz);
 void dibujar_aristas(vertice *V_o, arista *V_d);
-void indices(char *s);
 void input_teclado(unsigned char c, int x, int y);
-static void subdisplay_insertar(void);
+static void display_nuevo_archivo(void);
 void Menu(int opc);
 /**Declaración de variables globales*/
-int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;// pos_v=vp,start=inicio
+int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;
 char texto_menu_enc[50],nombre_archivo[50];
 char encabezado[100];
 int m; // Total de palabras contenidas en un texto
 p_Cola *Grafo;
 int x=50,y=170;
 int tam=300;
-int espacio=0; //intervalo->espacio
+int espacio=0; 
 int px=-30,py=35,yd=0;
 float radio_v=50.0;
 
 /**Función Main*/
 int main (int argc, char **argv)
 {
-	//crear_cola(&Grafo);
 	glutInit (&argc, argv);
 	initialize();
 	glutIdleFunc(refresh);
@@ -235,7 +235,6 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	{
 		FILE *file_g;
 		char c;
-		//file_g=fopen("Grafo_completo.txt","a");
 		if(!(file_g=fopen("Grafo_completo.txt","a")))
 		{
 			file_g=fopen("Grafo_completo.txt","w");
@@ -252,11 +251,11 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 		fclose(file_g);
 	}
 
-	char word[20],A_word[20],B_word[20]; //datos->word,origen->A_word,destino->B_word
+	char word[20],A_word[20],B_word[20]; 
 	memset(A_word,'\0',20);
 	memset(B_word,'\0',20);
-	int r=0; //resp->r;
-	int s=0; // estado-> s
+	int r=0; 
+	int s=0; 
 	while(r!=2){
 		memset(word,'\0',20);
 		r=leer_datos_archivo(file_r,word);
@@ -278,6 +277,7 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	}
 	fclose(file_r);
 	printf("\n\nTotal de palabras: %d\n",m);
+	calculos(G);
 	return 1;
 }
 
@@ -369,6 +369,32 @@ void calculos(p_Cola **G)
 {
 	probabilidad_ocurrencia(&(*G)->frente);
 }
+
+void eliminar_aristas(arista **A)
+{
+	if(!(*A))
+		return;
+	arista *aux=(*A);
+	(*A)=(*A)->sig;
+	free(aux);
+	eliminar_aristas(&(*A));
+}
+void eliminar_grafo(vertice **G)
+{
+	printf("entra a eliminar_grafo\n");
+	if(!(*G))
+		{
+			FILE *d_file=fopen("Grafo_completo.txt","w");
+			fclose(d_file);
+			return;
+		}
+	eliminar_aristas(&(*G)->lista_c);
+	vertice *aux=(*G);
+	(*G)=(*G)->enl_sig;
+	free(aux);
+	eliminar_grafo(G);
+}
+
 /**Definición de funciones para dibujar*/
 
 void initialize() {
@@ -392,7 +418,7 @@ void initialize() {
 		crear_cola(&Grafo);
 		cargar_grafo(&Grafo,"Grafo_completo.txt",0);
 		ver_vertices(Grafo->frente);
-		calculos(&Grafo);
+		//calculos(&Grafo);
 		start=0;
 	}
 
@@ -423,7 +449,6 @@ void display_cb() {
 	dibujar_vertices(Grafo->frente);
 	espacio=0;
 
-
 	glColor3d(0.372549,0.623529,0.623529);	//CadetBlue
 	glBegin (GL_QUADS);
 	glVertex2f(0,0);
@@ -432,12 +457,10 @@ void display_cb() {
 	glVertex2f(0,100);	
 	glEnd();
 	
-	
 	glColor3d(1,1,1);
 	glRasterPos2f(400.0f,20.0f);
 	sprintf(texto_menu_enc,"Controles");
 	dibujar_letras(texto_menu_enc,1);
-	
 	
 	glColor3d(1,1,1);
 	glRasterPos2f(30.0f,40.0f);
@@ -530,8 +553,9 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 
 	glColor3d(0.0f, 1.0f, 0.0f); //Verde
 	glRasterPos2f((V_o->c_x+A_d->destino->c_x)/2,(V_o->c_y+A_d->destino->c_y)/2);
-	sprintf(encabezado,"%6.5f",A_d->costo);
-	indices(encabezado);
+	//sprintf(encabezado,"%6.7f",A_d->costo);
+	sprintf(encabezado,"%6.7f",A_d->peso);
+	dibujar_letras(encabezado,3);
 
 	glPointSize(10);
 	glColor3d(1.0f, 0.5f, 0.0f); //Naranja
@@ -569,7 +593,7 @@ void dibujar_vertices(vertice *V){
 
 	glColor3d(1,1,1);
 	glRasterPos2f(V->c_x-(tam/10),V->c_y+(tam/12));
-	sprintf(encabezado,"%.5f",V->PA);
+	sprintf(encabezado,"%.7f",V->PA);
 	dibujar_letras(encabezado,2);
 	dibujar_vertices(V->enl_sig);
 }
@@ -596,7 +620,7 @@ void Menu(int opc){
 		printf("Opcion 1 menu\n");
 			sv= glutCreateSubWindow(pos_v,0,650,1520,100);
 			glutKeyboardFunc(input_teclado);
-			glutDisplayFunc(subdisplay_insertar);
+			glutDisplayFunc(display_nuevo_archivo);
 		break;
 		case 2:
 
@@ -605,7 +629,11 @@ void Menu(int opc){
 
 		break;
 		case 4:
-			
+			eliminar_grafo(&Grafo->frente);
+			m=0;
+			x=50;
+			y=170;
+			posicion=0; campo=1; leer_archivo=2; 
 		break;
 	}
 }
@@ -643,7 +671,7 @@ void input_teclado(unsigned char c, int x, int y){
 	}
 }
 
-static void subdisplay_insertar(void){
+static void display_nuevo_archivo(void){
 	glClearColor(0.372549,0.623529,0.623529,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
@@ -664,11 +692,6 @@ static void subdisplay_insertar(void){
 	glColor3d(1,1,1);
 	glRasterPos2f(-88.0f,0.0f);
 	sprintf(encabezado,"%s",nombre_archivo);
-	dibujar_letras(encabezado,3);
-
-	glColor3d(1,1,1);
-	glRasterPos2f(82.0f,10.0f);
-	sprintf(encabezado,"ESC - salir");
 	dibujar_letras(encabezado,3);
 
 	if(leer_archivo==1){
@@ -703,10 +726,4 @@ void dibujar_letras(char *s,int opc){
 					if(opc==3)
 						glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,s[i]);
 		}
-}
-
-void indices(char *s){
-	glColor3f(0.0f,0.0f,1.0f);
-	for(unsigned int i=0;i<strlen(s);i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,s[i]);
 }

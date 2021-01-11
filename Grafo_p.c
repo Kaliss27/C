@@ -49,6 +49,9 @@ void ver_arcos(arista *a); // Visualiza las conexiones por vertice
 int leer_datos_archivo(FILE *archivo,char *p);// Lee datos de un archivo, para llenar un grafo
 int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un grafo
 void transformar(char *dato);
+void probabilidad_ocurrencia(vertice **N); //Calcula la probabilidad de ocurrencia de una palabra
+void eliminar_aristas(arista **A);
+void eliminar_grafo(vertice **G);
 
 int m; // Total de palabras contenidas en un texto
 
@@ -57,7 +60,13 @@ int main (int argc, char **argv)
 {
 	p_Cola *G;
 	crear_cola(&G);
-	cargar_grafo(&G,"Lorem_ipsun.txt",1);
+	//cargar_grafo(&G,"don_quijote2.txt",0);
+	//cargar_grafo(&G,"Lorem_ipsun.txt",0);
+	//ver_vertices(G->frente);
+	cargar_grafo(&G,"don_quijote2.txt",0);
+	probabilidad_ocurrencia(&(G->frente));
+	ver_vertices(G->frente);
+	eliminar_grafo(&G->frente);
 	ver_vertices(G->frente);
 	//cargar_grafo(&G,"Lorem_ipsun.txt",1);
 	return 0;
@@ -65,25 +74,28 @@ int main (int argc, char **argv)
 /**Definición de funciones para grafos*/
 int leer_datos_archivo(FILE *file,char *p)
 {
-	if(feof(file)){
+	if(feof(file))
+	{
 		*p='\0';
 		return 2;
 	}
-	char dato;
-	fread(&dato,sizeof(char),1,file);
-	if(dato==',' || dato=='.' || dato==';' || dato==':' || dato=='\r' || dato=='\n' || dato=='\t' || dato==0 || dato==1 || dato==-62 || dato==-65 || dato=='?' || dato=='!' || dato=='(' || dato==')' || dato==-85 || dato==-69 || dato=='-' || dato==39 || dato==34){
-		if(dato==-62)
-			fread(&dato,sizeof(char),1,file);
+	char c;
+	fread(&c,sizeof(char),1,file);
+	if(c==',' || c=='.' || c==';' || c==':' || c==0 || c==1 || c==-62 || c==-65 || c=='?' || c=='!' || c=='(' || c==')' || c==-85 || c==-69 || c=='-' || c==39 || c==34 || c=='\r' || c=='\n' || c=='\t')
+	{
+		if(c==-62)
+			fread(&c,sizeof(char),1,file);
 		*p='\0';
 		return 1;
 	}
-	if(dato==' '){
+	if(c==' '){
 		*p='\0';
 		return 0;
 	}
-	if(dato!=-61){
-		transformar(&dato);
-		*p=tolower(dato);
+	if(c!=-61)
+	{
+		transformar(&c);
+		*p=tolower(c);
 		p++;
 	}
 	return leer_datos_archivo(file,p);
@@ -220,6 +232,8 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	}
 
 	char word[20],A_word[20],B_word[20]; //datos->word,origen->A_word,destino->B_word
+	memset(A_word,'\0',20);
+	memset(B_word,'\0',20);
 	int r=0; //resp->r;
 	int s=0; // estado-> s
 	while(r!=2){
@@ -246,7 +260,15 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	return 1;
 }
 
-
+void probabilidad_ocurrencia(vertice **N)
+{
+	if((*N))
+	{
+		(*N)->PA=(float)(((*N)->d)/m);
+		return probabilidad_ocurrencia(&(*N)->enl_sig);
+	}
+	return;
+}
 
 void transformar(char *dato){
 	int d=(int)(*dato);
@@ -278,7 +300,7 @@ void ver_vertices(vertice *vertices)
 {
 	if(vertices)
 	{
-		printf("|%s|->",vertices->palabra);
+		printf("|%s PA:%f|->",vertices->palabra,vertices->PA);
 		ver_arcos(vertices->lista_c);
 		printf("\n");
 		ver_vertices(vertices->enl_sig);
@@ -308,4 +330,27 @@ void crear_cola(p_Cola **cola)
 }
 
 //
-
+void eliminar_aristas(arista **A)
+{
+	if(!(*A))
+		return;
+	arista *aux=(*A);
+	(*A)=(*A)->sig;
+	free(aux);
+	eliminar_aristas(&(*A));
+}
+void eliminar_grafo(vertice **G)
+{
+	printf("entra a eliminar_grafo\n");
+	if(!(*G))
+		{
+			FILE *d_file=fopen("Grafo_completo.txt","w");
+			fclose(d_file);
+			return;
+		}
+	eliminar_aristas(&(*G)->lista_c);
+	vertice *aux=(*G);
+	(*G)=(*G)->enl_sig;
+	free(aux);
+	eliminar_grafo(G);
+}

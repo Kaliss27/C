@@ -69,6 +69,7 @@ void dibujar_aristas(vertice *V_o, arista *V_d);
 void input_teclado(unsigned char c, int x, int y);
 static void display_nuevo_archivo(void);
 void Menu(int opc);
+
 /**Declaración de variables globales*/
 int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;
 char texto_menu_enc[50],nombre_archivo[50];
@@ -629,7 +630,9 @@ void Menu(int opc){
 			m=0;
 			x=50;
 			y=170;
-			posicion=0; campo=1; leer_archivo=2; 
+			posicion=0; campo=1; leer_archivo=2;
+			Grafo->frente=NULL;
+			Grafo->final=NULL; 
 		break;
 	}
 }

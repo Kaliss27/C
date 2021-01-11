@@ -518,17 +518,11 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 	sprintf(encabezado,"%6.5f",A_d->costo);
 	indices(encabezado);
 
-	/*glPointSize(10);
-	glColor3d(1,1,0);
+	glPointSize(10);
+	glColor3d(1.0f, 0.5f, 0.0f);
 	glBegin(GL_POINTS);
 	glVertex2f((V_o->c_x+4*A_d->destino->c_x)/(5),(V_o->c_y+4*A_d->destino->c_y)/(5));
 	glEnd();
-
-	glPointSize(10);
-	glColor3d(1,0,0);
-	glBegin(GL_POINTS);
-	glVertex2f((4*V_o->c_x+A_d->destino->c_x)/(5),(4*V_o->c_y+A_d->destino->c_y)/(5));
-	glEnd();*/
 
 	dibujar_aristas(V_o,A_d->sig);
 }

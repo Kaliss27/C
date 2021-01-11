@@ -65,11 +65,13 @@ static void resize(int width, int height);
 void dibujar_conexiones(vertice *raiz);
 void dibujar_aristas(vertice *V_o, arista *V_d);
 void indices(char *s);
-
+void input_teclado(unsigned char c, int x, int y);
+static void subdisplay_insertar(void);
+void Menu(int opc);
 /**Declaración de variables globales*/
-int start=1,pos_v=0,sv=0;// pos_v=vp,start=inicio
+int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;// pos_v=vp,start=inicio
 char texto_menu_enc[50],nombre_archivo[50];
-char encabezado[30];
+char encabezado[100];
 int m; // Total de palabras contenidas en un texto
 p_Cola *Grafo;
 int x=50,y=170;
@@ -283,7 +285,6 @@ void probabilidad_ocurrencia(vertice **N)
 {
 	if((*N))
 	{
-		//printf("d:%f  m:%i\n",(*N)->d,m);
 		(*N)->PA=(float)(((*N)->d)/m);
 		return probabilidad_ocurrencia(&(*N)->enl_sig);
 	}
@@ -379,7 +380,7 @@ void initialize() {
 	glutReshapeFunc (resize);
 	glutDisplayFunc (display_cb);
 	glClearColor(0.0,0.0,0.0,0.0);	
-	glutCreateMenu(0);
+	glutCreateMenu(Menu);
 	glutAddMenuEntry("Anexar nuevo archivo de texto",1);
 	glutAddMenuEntry("Insertar nueva frase",2);
 	glutAddMenuEntry("Frases frecuentes",3);
@@ -433,21 +434,35 @@ void display_cb() {
 	
 	
 	glColor3d(1,1,1);
-	glRasterPos2f(491.0f,20.0f);
+	glRasterPos2f(400.0f,20.0f);
 	sprintf(texto_menu_enc,"Controles");
 	dibujar_letras(texto_menu_enc,1);
 	
 	
 	glColor3d(1,1,1);
-	glRasterPos2f(30.0f,30.0f);
+	glRasterPos2f(30.0f,40.0f);
 	sprintf(texto_menu_enc,"Menu de funciones -> Click izquierdo ");
-	dibujar_letras(texto_menu_enc,1);
+	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(1.0f, 0.0f, 1.0f);
+	glRasterPos2f(300.0f,40.0f);
+	sprintf(texto_menu_enc,"Origen");
+	dibujar_letras(texto_menu_enc,3);
 	
 	glColor3d(1,1,1);
-	glRasterPos2f(30.0f,60.0f);
+	glRasterPos2f(30.0f,65.0f);
 	sprintf(texto_menu_enc,"Moverse -> Teclas de direccion");
-	dibujar_letras(texto_menu_enc,1);
+	dibujar_letras(texto_menu_enc,3);
 
+    glColor3d(1.0f, 0.5f, 0.0f);
+	glRasterPos2f(300.0f,65.0f);
+	sprintf(texto_menu_enc,"Destino");
+	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(30.0f,90.0f);
+	sprintf(texto_menu_enc,"ESC-> Salir del menu de funciones");
+	dibujar_letras(texto_menu_enc,3);
 	
 	glPopMatrix();
 	glutSwapBuffers();
@@ -513,15 +528,21 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 		glVertex2f(A_d->destino->c_x,A_d->destino->c_y);
 	glEnd();
 
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(0.0f, 1.0f, 0.0f); //Verde
 	glRasterPos2f((V_o->c_x+A_d->destino->c_x)/2,(V_o->c_y+A_d->destino->c_y)/2);
 	sprintf(encabezado,"%6.5f",A_d->costo);
 	indices(encabezado);
 
 	glPointSize(10);
-	glColor3d(1.0f, 0.5f, 0.0f);
+	glColor3d(1.0f, 0.5f, 0.0f); //Naranja
 	glBegin(GL_POINTS);
 	glVertex2f((V_o->c_x+4*A_d->destino->c_x)/(5),(V_o->c_y+4*A_d->destino->c_y)/(5));
+	glEnd();
+
+	glPointSize(10);
+	glColor3d(1.0f, 0.0f, 1.0f);//Magenta
+	glBegin(GL_POINTS);
+	glVertex2f((4*V_o->c_x+A_d->destino->c_x)/(5),(4*V_o->c_y+A_d->destino->c_y)/(5));
 	glEnd();
 
 	dibujar_aristas(V_o,A_d->sig);
@@ -565,6 +586,111 @@ void dibujar_vertices(vertice *V){
 }*/
 
 
+void Menu(int opc){
+	if(sv!=0){
+		posicion=0; campo=1; leer_archivo=2;
+		glutDestroyWindow(sv);
+		sv=0;
+	}
+	switch(opc){
+		case 1:
+		printf("Opcion 1 menu\n");
+			sv= glutCreateSubWindow(pos_v,0,650,1520,100);
+			glutKeyboardFunc(input_teclado);
+			glutDisplayFunc(subdisplay_insertar);
+		break;
+		case 2:
+
+		break;
+		case 3:
+
+		break;
+		case 4:
+			
+		break;
+	}
+}
+
+void input_teclado(unsigned char c, int x, int y){
+	if(c==27 || (campo>2 && c==13)){
+		memset(nombre_archivo,'\0',50);
+		posicion=0;
+		campo=1;
+		leer_archivo=2;
+		glutDestroyWindow(glutGetWindow());
+		sv = 0;
+	}
+
+	if(c==13 && posicion>0){
+			campo++;
+			posicion=0;
+	}
+	if((c>=65 && c <=90) || (c>=97 && c<=122) || c==32 || c==46 || c==95 || (c>=48 && c<=57)){
+		if(campo==1){
+			nombre_archivo[posicion]=c;
+			posicion++;
+		}
+	}
+
+	if(c==8 && posicion>0){
+		posicion--;
+		if(campo==1)
+			nombre_archivo[posicion]='\0';
+	}
+
+	if(campo==2){
+		leer_archivo=cargar_grafo(&Grafo,nombre_archivo,1);
+		campo++;
+	}
+}
+
+static void subdisplay_insertar(void){
+	glClearColor(0.372549,0.623529,0.623529,0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D (-100,100,-50,50);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-70.0f,38.0f);
+	sprintf(encabezado,"Ingrese el nombre del archivo(nombre_archivo.txt),seguido de ""ENTER");
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-95.0f,0.0f);
+	sprintf(encabezado,"Archivo:");
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-88.0f,0.0f);
+	sprintf(encabezado,"%s",nombre_archivo);
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(82.0f,10.0f);
+	sprintf(encabezado,"ESC - salir");
+	dibujar_letras(encabezado,3);
+
+	if(leer_archivo==1){
+		glColor3d(1,1,1);
+		glRasterPos2f(50.0f,0.0f);
+		sprintf(encabezado,"Agregado correctamente!");
+		dibujar_letras(encabezado,3);
+	}
+	if(leer_archivo==0){
+		glColor3d(1,1,1);
+		glRasterPos2f(50.0f,0.0f);
+		sprintf(encabezado,"No se encontro el archivo!");
+		dibujar_letras(encabezado,3);
+	}
+	
+	glPopMatrix();
+	glutSwapBuffers();
+}
+
+
+
 void dibujar_letras(char *s,int opc){
 	glColor3f(0.0f,0.0f,1.0f);
 	for(unsigned int i=0;i<strlen(s);i++)
@@ -573,7 +699,10 @@ void dibujar_letras(char *s,int opc){
 				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,s[i]);
 			else
 				if(opc==2)
-					glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10,s[i]);
+					glutBitmapCharacter(GLUT_BITMAP_8_BY_13,s[i]);
+				else
+					if(opc==3)
+						glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,s[i]);
 		}
 }
 
@@ -582,47 +711,3 @@ void indices(char *s){
 	for(unsigned int i=0;i<strlen(s);i++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,s[i]);
 }
-
-/*void RespuestaMenu(int opc){
-	if(sv!=0){
-		posicion=0; campo=1; leer_archivo=2; posicion_predictiva=0; bandera_agregar_frase=2; bandera_predictiva=0; py=35;
-		memset(frase,'\0',strlen(frase)); memset(palabra_p,'\0',strlen(palabra_p)); memset(nombre_archivo,'\0',100);
-		memset(prediccion,'\0',20); memset(prediccion2,'\0',20); memset(prediccion3,'\0',20);
-		memset(palabra,'\0',strlen(palabra_p)); memset(palabra2,'\0',strlen(palabra_p)); memset(palabra3,'\0',strlen(palabra_p));
-		memset(palabra4,'\0',strlen(palabra_p)); memset(palabra5,'\0',strlen(palabra_p));
-		glutDestroyWindow(sv);
-		sv=0;
-	}
-	switch(opc){
-		case 1:
-			sv= glutCreateSubWindow(vp,0,650,1520,100);
-			glutKeyboardFunc(teclado_insertar);
-			glutDisplayFunc(subdisplay_insertar);
-		break;
-		case 2:
-			sv= glutCreateSubWindow(vp,0,650,1520,100);
-			glutKeyboardFunc(teclado_predictivo);
-			glutDisplayFunc(subdisplay_predictivo);
-		break;
-		case 3:
-			sv= glutCreateSubWindow(vp,0,650,1520,100);
-			glutKeyboardFunc(teclado_frases);
-			glutDisplayFunc(subdisplay_frases);
-		break;
-		case 4:
-			if(raiz){
-				eliminar_grafo(&raiz);
-				remove("guardado.txt");
-				N_nodos=0;
-				x=70;
-				y=100;
-				posicion=0; campo=1; leer_archivo=2; posicion_predictiva=0; bandera_agregar_frase=2; bandera_predictiva=0; py=35;
-				memset(frase,'\0',strlen(frase)); memset(palabra_p,'\0',strlen(palabra_p)); memset(nombre_archivo,'\0',100);
-				memset(prediccion,'\0',20); memset(prediccion2,'\0',20); memset(prediccion3,'\0',20);
-				memset(palabra,'\0',strlen(palabra_p)); memset(palabra2,'\0',strlen(palabra_p)); memset(palabra3,'\0',strlen(palabra_p));
-				memset(palabra4,'\0',strlen(palabra_p)); memset(palabra5,'\0',strlen(palabra_p));
-			}
-		break;
-	}
-}
-*/

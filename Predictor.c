@@ -8,15 +8,11 @@ s17002346 - Peralta Luna Karen Lisseth
 #include<ctype.h>
 #include<math.h>
 
-#define l 30 //Longitud del nombre de archivo
-#define wl 20 //Longitud de palabras
-
-
 /**Estructuras*/
 
 typedef struct nodo_vertice
 {
-	char palabra[l];  //Palabra
+	char palabra[30];  //Palabra
 	float PA;  //Probabilidad de ocurrencia
 	float d; //# de ocurrencia
 	struct lista_adyacencia *lista_c; //inicio a lista de aristas
@@ -49,6 +45,7 @@ void ver_arcos(arista *a); // Visualiza las conexiones por vertice
 int leer_datos_archivo(FILE *archivo,char *p);// Lee datos de un archivo, para llenar un grafo
 int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un grafo
 void transformar(char *dato);
+float probabilidad_ocurrencia(int d); //Calcula la probabilidad de ocurrencia de una palabra
 
 
 /**Declaración de funciones para dibujar*/
@@ -73,25 +70,27 @@ int main (int argc, char **argv)
 /**Definición de funciones para grafos*/
 int leer_datos_archivo(FILE *file,char *p)
 {
-	if(feof(file)){
+	if(feof(file))
+	{
 		*p='\0';
 		return 2;
 	}
-	char dato;
-	fread(&dato,sizeof(char),1,file);
-	if(dato==',' || dato=='.' || dato==';' || dato==':' || dato=='\r' || dato=='\n' || dato=='\t' || dato==0 || dato==1 || dato==-62 || dato==-65 || dato=='?' || dato=='!' || dato=='(' || dato==')' || dato==-85 || dato==-69 || dato=='-' || dato==39 || dato==34){
-		if(dato==-62)
-			fread(&dato,sizeof(char),1,file);
+	char c;
+	fread(&c,sizeof(char),1,file);
+	if(c==',' || c=='.' || c==';' || c==':' || c==0 || c==1 || c==-62 || c==-65 || c=='?' || c=='!' || c=='(' || c==')' || c==-85 || c==-69 || c=='-' || c==39 || c==34 || c=='\r' || c=='\n' || c=='\t')
+	{
+		if(c==-62)
+			fread(&c,sizeof(char),1,file);
 		*p='\0';
 		return 1;
 	}
-	if(dato==' '){
+	if(c==' '){
 		*p='\0';
 		return 0;
 	}
-	if(dato!=-61){
-		transformar(&dato);
-		*p=tolower(dato);
+	if(c!=-61){
+		transformar(&c);
+		*p=tolower(c);
 		p++;
 	}
 	return leer_datos_archivo(file,p);
@@ -151,6 +150,17 @@ vertice **buscar_vertice(vertice **V,char *word_b)
 	else return NULL;
 }
 
+arista **buscar_arista(arista **A,vertice *V_d)
+{
+	if((*A))
+	{
+		if((*A)->destino == V_d)
+			return A;
+		else buscar_arista(&(*A)->sig,V_d);
+	}
+	else return NULL;
+}
+
 int crear_arco(vertice *V_d,arista **a)
 {
 	arista *newe=(arista*)malloc(sizeof(arista));
@@ -158,6 +168,7 @@ int crear_arco(vertice *V_d,arista **a)
 		return 0;
 	newe->destino=V_d;
 	newe->sig=(*a);
+	newe->peso=1.0;
 	(*a)=newe;
 	return 1;
 }
@@ -166,12 +177,20 @@ int crear_conexiones(p_Cola **G,char *A,char *B)
 {
 	vertice **V_o=buscar_vertice(&(*G)->frente,A);
 	vertice **V_d=buscar_vertice(&(*G)->frente,B);
-	if(V_o && V_d)
+
+	arista **conexion=buscar_arista(&(*V_o)->lista_c,(*V_d));
+
+	if(!conexion)
 	{
 		int bnd=crear_arco((*V_d),&(*V_o)->lista_c);
 		if(bnd==1)
-			return 1;
+			return 1; // 1-> se creo nuevo arco
 		else return 0;
+	}
+	else
+	{
+		(*conexion)->peso++;
+		return 2; // 2-> Ya existia conexiòn, se agrego una unidad al peso
 	}
 	return 0;
 }
@@ -208,6 +227,8 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	}
 
 	char word[20],A_word[20],B_word[20]; //datos->word,origen->A_word,destino->B_word
+	memset(A_word,'\0',20);
+	memset(B_word,'\0',20);
 	int r=0; //resp->r;
 	int s=0; // estado-> s
 	while(r!=2){
@@ -234,7 +255,10 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	return 1;
 }
 
-
+float probabilidad_ocurrencia(int d)
+{
+	return (float)(d/m);
+}
 
 void transformar(char *dato){
 	int d=(int)(*dato);
@@ -266,7 +290,7 @@ void ver_vertices(vertice *vertices)
 {
 	if(vertices)
 	{
-		//printf("|%c|->",vertices->clv);
+		printf("|%s|->",vertices->palabra);
 		ver_arcos(vertices->lista_c);
 		printf("\n");
 		ver_vertices(vertices->enl_sig);
@@ -276,14 +300,14 @@ void ver_vertices(vertice *vertices)
 
 void ver_arcos(arista *a)
 {
-	/*if(a)
+	if(a)
 	{
 	if(!a->sig)
-	printf("[%c]",a->destino->clv);
+	printf("[%s]",a->destino->palabra);
 	else
-	printf("[%c]-",a->destino->clv);
+	printf("[%s]-",a->destino->palabra);
 	ver_arcos(a->sig);
-}*/
+}
 	return;
 	
 }
@@ -294,9 +318,6 @@ void crear_cola(p_Cola **cola)
 	(*cola)->final=NULL;
 	return;
 }
-
-//
-
 
 
 /**Definición de funciones para dibujar*/

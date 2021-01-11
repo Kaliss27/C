@@ -45,7 +45,7 @@ void ver_arcos(arista *a); // Visualiza las conexiones por vertice
 int leer_datos_archivo(FILE *archivo,char *p);// Lee datos de un archivo, para llenar un grafo
 int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un grafo
 void transformar(char *dato);
-float probabilidad_ocurrencia(int d); //Calcula la probabilidad de ocurrencia de una palabra
+void probabilidad_ocurrencia(vertice **N); //Calcula la probabilidad de ocurrencia de una palabra
 
 
 /**Declaración de funciones para dibujar*/
@@ -88,7 +88,8 @@ int leer_datos_archivo(FILE *file,char *p)
 		*p='\0';
 		return 0;
 	}
-	if(c!=-61){
+	if(c!=-61)
+	{
 		transformar(&c);
 		*p=tolower(c);
 		p++;
@@ -255,9 +256,14 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	return 1;
 }
 
-float probabilidad_ocurrencia(int d)
+void probabilidad_ocurrencia(vertice **N)
 {
-	return (float)(d/m);
+	if((*N))
+	{
+		(*N)->PA=(float)(((*N)->d)/m);
+		return probabilidad_ocurrencia(&(*N)->enl_sig);
+	}
+	return;
 }
 
 void transformar(char *dato){
@@ -290,7 +296,7 @@ void ver_vertices(vertice *vertices)
 {
 	if(vertices)
 	{
-		printf("|%s|->",vertices->palabra);
+		printf("|%s PA:%f|->",vertices->palabra,vertices->PA);
 		ver_arcos(vertices->lista_c);
 		printf("\n");
 		ver_vertices(vertices->enl_sig);
@@ -318,6 +324,9 @@ void crear_cola(p_Cola **cola)
 	(*cola)->final=NULL;
 	return;
 }
+
+//
+
 
 
 /**Definición de funciones para dibujar*/

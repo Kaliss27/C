@@ -739,17 +739,6 @@ void dibujar_vertices(vertice *V){
 	dibujar_vertices(V->enl_sig);
 }
 
-
-/*void reshape_cb (int w, int h) {
-	if (w==0||h==0) return;
-	glViewport(0,0,w,h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluOrtho2D(0,w,0,h);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-}*/
-
 void Menu(int opc){
 	if(sv!=0){
 		posicion=0; campo=1; leer_archivo=2;
@@ -857,7 +846,6 @@ static void display_nuevo_archivo(void){
 		sprintf(encabezado,"No se encontro el archivo!");
 		dibujar_letras(encabezado,3);
 	}
-	
 	glPopMatrix();
 	glutSwapBuffers();
 }
@@ -870,7 +858,6 @@ void input_teclado_Dikjstra(unsigned char c, int x, int y){
 		glutDestroyWindow(glutGetWindow());
 		sv = 0;
 	}
-
 	if(c==13 && posicion>0){
 			campo++;
 			posicion=0;
@@ -881,14 +868,11 @@ void input_teclado_Dikjstra(unsigned char c, int x, int y){
 			posicion++;
 		}
 	}
-
 	if(c==8 && posicion>0){
 		posicion--;
 		if(campo==1)
 			frase[posicion]='\0';
 	}
-
-
 }
 
 static void display_operaciones_Diksjtra(void){
@@ -947,9 +931,9 @@ void input_teclado_frases(unsigned char c, int x, int y){
 		bnd_pr=1;
 		printf("%s\n",palabra_f);
 	}
-	if(bnd_pr && c=='w')
+	if(bnd_pr && c=='u')
 		py-=10;
-	if(bnd_pr && c=='s')
+	if(bnd_pr && c=='d')
 		py+=10;
 }
 

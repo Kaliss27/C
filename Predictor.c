@@ -37,6 +37,8 @@ typedef struct Cola
 	vertice *final;
 }p_Cola;
 
+
+
 /**Declaración de funciones para Grafos*/
 vertice *alojar_vertice(char *palabra_a); //Crea espacio en memoria para un vertice del grafo, sin crear conexiones 
 vertice **buscar_vertice(vertice **V,char *word_b);
@@ -521,9 +523,6 @@ void ordenamiento(vertice **V)
 
 ////////////////
 
-
-
-
 /**Definición de funciones para dibujar*/
 
 void initialize() {
@@ -598,6 +597,11 @@ void display_cb() {
 	glRasterPos2f(300.0f,40.0f);
 	sprintf(texto_menu_enc,"Origen");
 	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(0.0f, 0.1f, 0.1f);
+	glRasterPos2f(600.0f,40.0f);
+	sprintf(texto_menu_enc,"Palabra");
+	dibujar_letras(texto_menu_enc,3);
 	
 	glColor3d(1,1,1);
 	glRasterPos2f(30.0f,65.0f);
@@ -609,9 +613,19 @@ void display_cb() {
 	sprintf(texto_menu_enc,"Destino");
 	dibujar_letras(texto_menu_enc,3);
 
+	glColor3d(0.137255,0.137255,0.556863); //NavyBlue
+	glRasterPos2f(600.0f,65.0f);
+	sprintf(texto_menu_enc,"Frase");
+	dibujar_letras(texto_menu_enc,3);
+
 	glColor3d(1,1,1);
 	glRasterPos2f(30.0f,90.0f);
-	sprintf(texto_menu_enc,"ESC-> Salir del menu de funciones");
+	sprintf(texto_menu_enc,"Salir del menu de funciones-> ESC");
+	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(0.0f, 1.0f, 0.0f);
+	glRasterPos2f(300.0f,90.0f);
+	sprintf(texto_menu_enc,"Costo de arista");
 	dibujar_letras(texto_menu_enc,3);
 	
 	glPopMatrix();
@@ -818,7 +832,7 @@ static void display_nuevo_archivo(void){
 
 	glColor3d(1,1,1);
 	glRasterPos2f(-70.0f,40.0f);
-	sprintf(encabezado,"Ingrese el nombre del archivo(nombre_archivo.txt),seguido de ""ENTER");
+	sprintf(encabezado,"Ingrese el nombre del archivo(nombre_archivo.txt),seguido de <ENTER>");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
@@ -887,7 +901,7 @@ static void display_operaciones_Diksjtra(void){
 
 	glColor3d(1,1,1);
 	glRasterPos2f(-50.0f,40.0f);
-	sprintf(encabezado,"Agregar Frase");
+	sprintf(encabezado,"Escriba frase y presione <ENTER> para añadir al grafo");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
@@ -950,7 +964,7 @@ static void display_frases(void){
 	
 	glColor3d(1,1,1);
 	glRasterPos2f(-95.0f,40.0f);
-	sprintf(encabezado,"Ingrese una palabra");
+	sprintf(encabezado,"Ingrese una palabra, seguida de <ENTER>");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);

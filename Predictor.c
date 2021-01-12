@@ -59,7 +59,8 @@ void eliminar_aristas(arista **A);
 void eliminar_grafo(vertice **G);
 void swap(arista **aux1,arista **aux2,arista **new_f);
 void bubble_sort(arista **inicio);
-void ordenamiento(arista **inicio,int n_elem);
+void ordenamiento(vertice **V);
+int count_elem(arista *inicio,int c);//cuenta aristas de un vertice
 /**Declaración de funciones para dibujar*/
 void reshape_cb (int w, int h);
 void display_cb();
@@ -77,11 +78,17 @@ static void display_nuevo_archivo(void);
 void Menu(int opc);
 void input_teclado_Dikjstra(unsigned char c, int x, int y);
 static void display_operaciones_Diksjtra(void);
+void input_teclado_frases(unsigned char c, int x, int y);
+static void display_frases(void);
+void palabras_frecuentes(vertice *raiz, int contador,int xx);
+void p_fre_aristas(arista *raiz,int contador,int xx);
+void asignar_palabra(char *pal,int contador,int opc);
 
 /**Declaración de variables globales*/
 int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;
 char texto_menu_enc[50],nombre_archivo[50];
-char encabezado[100],frase[100];
+char encabezado[100],frase[100],palabra_f[50];
+char palabra1[20],palabra2[20],palabra3[20],palabra4[20],palabra5[20];
 int m; // Total de palabras contenidas en un texto
 p_Cola *Grafo;
 int x=50,y=170;
@@ -89,6 +96,7 @@ int tam=300;
 int espacio=0; 
 int px=-30,py=35,yd=0;
 float radio_v=50.0;
+int pos_pr=0,bnd_pr=0;
 
 /**Función Main*/
 int main (int argc, char **argv)
@@ -292,6 +300,7 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	fclose(file_r);
 	printf("\n\nTotal de palabras: %d\n",m);
 	calculos(G);
+	ordenamiento(&(*G)->frente);
 	//probabilidad_ocurrencia(&(*G)->frente);
 	//formulas_bayesianas((*G)->frente);
 	return 1;
@@ -442,6 +451,13 @@ void eliminar_grafo(vertice **G)
 	eliminar_grafo(G);
 }
 
+int count_elem(arista *inicio,int c)
+{
+	if(!inicio)
+		return c;
+	c++;
+	return count_elem(inicio->sig,c);
+}
 void swap(arista **aux1,arista **aux2,arista **new_f)
 {
 	arista *aux=(*aux1);
@@ -490,12 +506,17 @@ void bubble_sort(arista **inicio)
 	bubble_sort(&(*inicio)->sig);
 	return;
 }
-void ordenamiento(arista **inicio,int n_elem)
+void ordenamiento(vertice **V)
 {
-	for(int i=0;i<n_elem;i++)
+	if((*V))
 	{
-		bubble_sort(inicio);
+		for(int i=0;i<count_elem((*V)->lista_c,0);i++)
+		{
+			bubble_sort(&(*V)->lista_c);
+		}
+		ordenamiento(&(*V)->enl_sig);
 	}
+	return;
 }
 
 ////////////////
@@ -733,7 +754,14 @@ void Menu(int opc){
 			glutDisplayFunc(display_operaciones_Diksjtra);
 		break;
 		case 3:
-
+		    memset(palabra1,'\0',strlen(palabra_f)); 
+		    memset(palabra2,'\0',strlen(palabra_f)); 
+		    memset(palabra3,'\0',strlen(palabra_f));
+		    memset(palabra4,'\0',strlen(palabra_f)); 
+		    memset(palabra5,'\0',strlen(palabra_f));
+		    sv= glutCreateSubWindow(pos_v,0,650,1520,100);
+			glutKeyboardFunc(input_teclado_frases);
+			glutDisplayFunc(display_frases);
 		break;
 		case 4:
 			eliminar_grafo(&Grafo->frente);
@@ -876,7 +904,147 @@ static void display_operaciones_Diksjtra(void){
 	glutSwapBuffers();
 }
 
+void input_teclado_frases(unsigned char c, int x, int y){
+	if(c==27 || (campo>2 && c==13)){
+		memset(palabra_f,'\0',strlen(palabra_f)); 
+		bnd_pr=0; py=35;
+		posicion=0;
+		campo=1;
+		glutDestroyWindow(glutGetWindow());
+		sv = 0;
+	}
+	if(c==13 && posicion>0){
+			campo++;
+			posicion=0;
+	}
+	if((c>=65 && c <=90) || (c>=97 && c<=122) || c==32 || c==46 || (c>=48 && c<=57)){
+		if(campo==1 && posicion<20){
+			palabra_f[posicion]=c;
+			posicion++;
+		}
+	}
+	if(c==8 && posicion>0){
+		posicion--;
+		palabra_f[posicion]='\0';
+	}
 
+	if(campo==2){
+		campo++;
+		bnd_pr=1;
+		printf("%s\n",palabra_f);
+	}
+	if(bnd_pr && c=='w')
+		py-=10;
+	if(bnd_pr && c=='s')
+		py+=10;
+}
+
+
+static void display_frases(void){
+	glClearColor(0.372549,0.623529,0.623529,0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D (-100,100,-50,50);
+	
+	glColor3d(1,1,1);
+	glRasterPos2f(-95.0f,40.0f);
+	sprintf(encabezado,"Ingrese una palabra");
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-95.0f,28.0f);
+	sprintf(encabezado,"Palabra:");
+	dibujar_letras(encabezado,3);
+
+	if(!bnd_pr)
+		glColor3d(1,1,1);
+	else
+		glColor3d(0.0f, 0.1f, 0.1f);
+	glRasterPos2f(-88.0f,28.0f);
+	sprintf(encabezado,"%s",palabra_f);
+	dibujar_letras(encabezado,3); 
+
+	if(bnd_pr){
+		yd=py;
+		palabras_frecuentes((*buscar_vertice(&Grafo->frente,palabra_f)),0,px);
+	}	
+	
+	glPopMatrix();
+	glutSwapBuffers();
+}
+
+void palabras_frecuentes(vertice *raiz, int contador,int xx){
+	if(!raiz) return;
+	if((!raiz->lista_c && contador>0) || contador==4){
+		asignar_palabra(raiz->palabra,contador,1);
+
+		glColor3d(0.137255,0.137255,0.556863);
+		glRasterPos2f(xx,yd);
+		sprintf(encabezado,"%s",palabra1);
+		dibujar_letras(encabezado,3);
+
+		glColor3d(0.137255,0.137255,0.556863);
+		glRasterPos2f(xx+20,yd);
+		sprintf(encabezado,"%s",palabra2);
+		dibujar_letras(encabezado,3);
+
+		glColor3d(0.137255,0.137255,0.556863);
+		glRasterPos2f(xx+40,yd);
+		sprintf(encabezado,"%s",palabra3);
+		dibujar_letras(encabezado,3);
+
+		glColor3d(0.137255,0.137255,0.556863);
+		glRasterPos2f(xx+60,yd);
+		sprintf(encabezado,"%s",palabra4);
+		dibujar_letras(encabezado,3);
+
+		glColor3d(0.137255,0.137255,0.556863);
+		glRasterPos2f(xx+80,yd);
+		sprintf(encabezado,"%s",palabra5);
+		dibujar_letras(encabezado,3);
+
+		yd-=18;
+		return;
+	}
+	asignar_palabra(raiz->palabra,contador,1);
+	p_fre_aristas(raiz->lista_c,contador+1,xx);
+}
+
+void p_fre_aristas(arista *raiz,int contador,int xx){
+	if(!raiz)
+		return;
+	palabras_frecuentes(raiz->destino,contador,xx);
+	asignar_palabra("\n",contador,2);
+	p_fre_aristas(raiz->sig,contador,xx);
+}
+
+void asignar_palabra(char *pal,int contador,int opc){
+	if(opc){
+		if(contador==0)
+		strcpy(palabra1,pal);
+		if(contador==1)
+		strcpy(palabra2,pal);
+		if(contador==2)
+		strcpy(palabra3,pal);
+		if(contador==3)
+			strcpy(palabra4,pal);
+		if(contador==4)
+			strcpy(palabra5,pal);
+	}else{
+		if(contador==0)
+			memset(palabra1,'\0',strlen(palabra1));
+		if(contador==1)
+			memset(palabra2,'\0',strlen(palabra2));
+		if(contador==2)
+			memset(palabra3,'\0',strlen(palabra3));
+		if(contador==3)
+			memset(palabra4,'\0',strlen(palabra4));
+		if(contador==4)
+			memset(palabra5,'\0',strlen(palabra5));
+	}
+}
 
 void dibujar_letras(char *s,int opc){
 	glColor3f(0.0f,0.0f,1.0f);

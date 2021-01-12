@@ -26,7 +26,7 @@ typedef struct lista_adyacencia
 	vertice *destino; //Vertice con el que se conecta
 	float peso; // Peso del arista
 	struct lista_adyacencia *sig;//Conexion con otras aristas
-	float costo; // Resultado de formula bayesiana
+	float PAB; //Costo calculado con form bayesiana
 }arista;
 
 
@@ -49,6 +49,9 @@ int leer_datos_archivo(FILE *archivo,char *p);// Lee datos de un archivo, para l
 int cargar_grafo(p_Cola **G,char *n_file,int opc);//Crea y carga los datos en un grafo
 void transformar(char *dato);
 void probabilidad_ocurrencia(vertice **N); //Calcula la probabilidad de ocurrencia de una palabra
+int contar_aristas(arista *conexiones);
+void asignar_costo_aristas(arista *arista_c,float PA_o);
+void formulas_bayesianas(vertice *G);
 void contar_vertices(vertice *V);
 void calculos(p_Cola **G);
 void eliminar_aristas(arista **A);
@@ -69,11 +72,13 @@ void dibujar_aristas(vertice *V_o, arista *V_d);
 void input_teclado(unsigned char c, int x, int y);
 static void display_nuevo_archivo(void);
 void Menu(int opc);
+void input_teclado_Dikjstra(unsigned char c, int x, int y);
+static void display_operaciones_Diksjtra(void);
 
 /**Declaración de variables globales*/
 int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;
 char texto_menu_enc[50],nombre_archivo[50];
-char encabezado[100];
+char encabezado[100],frase[100];
 int m; // Total de palabras contenidas en un texto
 p_Cola *Grafo;
 int x=50,y=170;
@@ -194,7 +199,7 @@ int crear_arco(vertice *V_d,arista **a)
 	newe->destino=V_d;
 	newe->sig=(*a);
 	newe->peso=1.0;
-	newe->costo=0.0;
+	newe->PAB=0.0;
 	(*a)=newe;
 	return 1;
 }
@@ -279,6 +284,8 @@ int cargar_grafo(p_Cola **G,char *n_file,int opc)
 	fclose(file_r);
 	printf("\n\nTotal de palabras: %d\n",m);
 	calculos(G);
+	//probabilidad_ocurrencia(&(*G)->frente);
+	//formulas_bayesianas((*G)->frente);
 	return 1;
 }
 
@@ -291,6 +298,37 @@ void probabilidad_ocurrencia(vertice **N)
 	}
 	return;
 }
+
+int contar_aristas(arista *conexiones)
+{
+	if (!conexiones) return 0;
+    return 1 + contar_aristas(conexiones->sig);
+}
+
+void asignar_costo_aristas(arista *arista_c,float PA_o)
+{
+	if(arista_c)
+	{
+		float BnA = (float)(arista_c->peso/contar_aristas(arista_c));
+		if(PA_o==0.0)
+			return;
+		arista_c->PAB=(BnA)/PA_o;
+		printf("PAB:%f\n",arista_c->PAB);
+		asignar_costo_aristas(arista_c->sig,PA_o);
+	}
+	return;
+}
+
+void formulas_bayesianas(vertice *G)
+{
+	if(G)
+	{
+		asignar_costo_aristas(G->lista_c,G->PA);
+		formulas_bayesianas(G->enl_sig);
+	}
+	return; 
+}
+
 
 void transformar(char *dato){
 	int d=(int)(*dato);
@@ -368,6 +406,7 @@ void contar_vertices(vertice *V){
 void calculos(p_Cola **G)
 {
 	probabilidad_ocurrencia(&(*G)->frente);
+	formulas_bayesianas((*G)->frente);
 }
 
 void eliminar_aristas(arista **A)
@@ -551,7 +590,7 @@ void dibujar_aristas(vertice *V_o, arista *A_d){
 
 	glColor3d(0.0f, 1.0f, 0.0f); //Verde
 	glRasterPos2f((V_o->c_x+A_d->destino->c_x)/2,(V_o->c_y+A_d->destino->c_y)/2);
-	sprintf(encabezado,"%6.7f",A_d->costo);
+	sprintf(encabezado,"%6.7f",A_d->PAB);
 	//sprintf(encabezado,"%6.7f",A_d->peso);
 	dibujar_letras(encabezado,3);
 
@@ -620,7 +659,9 @@ void Menu(int opc){
 			glutDisplayFunc(display_nuevo_archivo);
 		break;
 		case 2:
-
+		    sv= glutCreateSubWindow(pos_v,0,650,1520,100);
+			glutKeyboardFunc(input_teclado_Dikjstra);
+			glutDisplayFunc(display_operaciones_Diksjtra);
 		break;
 		case 3:
 
@@ -686,6 +727,79 @@ static void display_nuevo_archivo(void){
 	glColor3d(1,1,1);
 	glRasterPos2f(-95.0f,0.0f);
 	sprintf(encabezado,"Archivo:");
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-88.0f,0.0f);
+	sprintf(encabezado,"%s",nombre_archivo);
+	dibujar_letras(encabezado,3);
+
+	if(leer_archivo==1){
+		glColor3d(1,1,1);
+		glRasterPos2f(50.0f,0.0f);
+		sprintf(encabezado,"Agregado correctamente!");
+		dibujar_letras(encabezado,3);
+	}
+	if(leer_archivo==0){
+		glColor3d(1,1,1);
+		glRasterPos2f(50.0f,0.0f);
+		sprintf(encabezado,"No se encontro el archivo!");
+		dibujar_letras(encabezado,3);
+	}
+	
+	glPopMatrix();
+	glutSwapBuffers();
+}
+
+void input_teclado_Dikjstra(unsigned char c, int x, int y){
+	if(c==27 || (campo>2 && c==13)){
+		memset(frase,'\0',50);
+		posicion=0;
+		campo=1;
+		leer_archivo=2;
+		glutDestroyWindow(glutGetWindow());
+		sv = 0;
+	}
+
+	if(c==13 && posicion>0){
+			campo++;
+			posicion=0;
+	}
+	if((c>=65 && c <=90) || (c>=97 && c<=122) || c==32 || c==46 || c==95 || (c>=48 && c<=57)){
+		if(campo==1){
+			nombre_archivo[posicion]=c;
+			posicion++;
+		}
+	}
+
+	if(c==8 && posicion>0){
+		posicion--;
+		if(campo==1)
+			nombre_archivo[posicion]='\0';
+	}
+
+	if(campo==2){
+		leer_archivo=cargar_grafo(&Grafo,nombre_archivo,1);
+		campo++;
+	}
+}
+
+static void display_operaciones_Diksjtra(void){
+	glClearColor(0.372549,0.623529,0.623529,0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D (-100,100,-50,50);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-70.0f,38.0f);
+	sprintf(encabezado,"Agregar Frase");
+	dibujar_letras(encabezado,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(-95.0f,0.0f);
+	sprintf(encabezado,"Frase:");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);

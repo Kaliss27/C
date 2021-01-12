@@ -720,17 +720,17 @@ static void display_nuevo_archivo(void){
 	gluOrtho2D (-100,100,-50,50);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-70.0f,38.0f);
+	glRasterPos2f(-70.0f,40.0f);
 	sprintf(encabezado,"Ingrese el nombre del archivo(nombre_archivo.txt),seguido de ""ENTER");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-95.0f,0.0f);
+	glRasterPos2f(-95.0f,28.0f);
 	sprintf(encabezado,"Archivo:");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-88.0f,0.0f);
+	glRasterPos2f(-88.0f,28.0f);
 	sprintf(encabezado,"%s",nombre_archivo);
 	dibujar_letras(encabezado,3);
 
@@ -753,10 +753,9 @@ static void display_nuevo_archivo(void){
 
 void input_teclado_Dikjstra(unsigned char c, int x, int y){
 	if(c==27 || (campo>2 && c==13)){
-		memset(frase,'\0',50);
+		memset(frase,'\0',strlen(frase));
 		posicion=0;
 		campo=1;
-		leer_archivo=2;
 		glutDestroyWindow(glutGetWindow());
 		sv = 0;
 	}
@@ -767,7 +766,7 @@ void input_teclado_Dikjstra(unsigned char c, int x, int y){
 	}
 	if((c>=65 && c <=90) || (c>=97 && c<=122) || c==32 || c==46 || c==95 || (c>=48 && c<=57)){
 		if(campo==1){
-			nombre_archivo[posicion]=c;
+			frase[posicion]=c;
 			posicion++;
 		}
 	}
@@ -775,13 +774,10 @@ void input_teclado_Dikjstra(unsigned char c, int x, int y){
 	if(c==8 && posicion>0){
 		posicion--;
 		if(campo==1)
-			nombre_archivo[posicion]='\0';
+			frase[posicion]='\0';
 	}
 
-	if(campo==2){
-		leer_archivo=cargar_grafo(&Grafo,nombre_archivo,1);
-		campo++;
-	}
+
 }
 
 static void display_operaciones_Diksjtra(void){
@@ -793,33 +789,20 @@ static void display_operaciones_Diksjtra(void){
 	gluOrtho2D (-100,100,-50,50);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-70.0f,38.0f);
+	glRasterPos2f(-50.0f,40.0f);
 	sprintf(encabezado,"Agregar Frase");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-95.0f,0.0f);
+	glRasterPos2f(-95.0f,28.0f);
 	sprintf(encabezado,"Frase:");
 	dibujar_letras(encabezado,3);
 
 	glColor3d(1,1,1);
-	glRasterPos2f(-88.0f,0.0f);
-	sprintf(encabezado,"%s",nombre_archivo);
+	glRasterPos2f(-88.0f,28.0f);
+	sprintf(encabezado,"%s",frase);
 	dibujar_letras(encabezado,3);
 
-	if(leer_archivo==1){
-		glColor3d(1,1,1);
-		glRasterPos2f(50.0f,0.0f);
-		sprintf(encabezado,"Agregado correctamente!");
-		dibujar_letras(encabezado,3);
-	}
-	if(leer_archivo==0){
-		glColor3d(1,1,1);
-		glRasterPos2f(50.0f,0.0f);
-		sprintf(encabezado,"No se encontro el archivo!");
-		dibujar_letras(encabezado,3);
-	}
-	
 	glPopMatrix();
 	glutSwapBuffers();
 }

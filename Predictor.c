@@ -26,6 +26,7 @@ typedef struct lista_adyacencia
 	vertice *destino; //Vertice con el que se conecta
 	float peso; // Peso del arista
 	struct lista_adyacencia *sig;//Conexion con otras aristas
+	struct lista_adyacencia *ant;//Conexion con otras aristas
 	float PAB; //Costo calculado con form bayesiana
 }arista;
 
@@ -56,7 +57,9 @@ void contar_vertices(vertice *V);
 void calculos(p_Cola **G);
 void eliminar_aristas(arista **A);
 void eliminar_grafo(vertice **G);
-
+void swap(arista **aux1,arista **aux2,arista **new_f);
+void bubble_sort(arista **inicio);
+void ordenamiento(arista **inicio,int n_elem);
 /**Declaración de funciones para dibujar*/
 void reshape_cb (int w, int h);
 void display_cb();
@@ -197,6 +200,11 @@ int crear_arco(vertice *V_d,arista **a)
 	if(!newe)
 		return 0;
 	newe->destino=V_d;
+	if(!(*a))
+		newe->ant=(*a);
+	else
+		(*a)->ant=newe;
+	//newe->ant=NULL;
 	newe->sig=(*a);
 	newe->peso=1.0;
 	newe->PAB=0.0;
@@ -433,6 +441,67 @@ void eliminar_grafo(vertice **G)
 	free(aux);
 	eliminar_grafo(G);
 }
+
+void swap(arista **aux1,arista **aux2,arista **new_f)
+{
+	arista *aux=(*aux1);
+	arista *auxx=(*aux1)->ant;
+
+	(*aux1)=(*aux2);
+	(*aux2)=aux;
+	(*aux1)->ant=(*aux2)->ant;
+	(*aux2)->ant=(*aux1);
+	(*aux2)->sig=(*aux1)->sig;
+
+	(*aux1)->sig=(*aux2);
+
+	aux=(*aux2)->sig;
+	if(aux)     //Verifica si se cambia con el ultimo elemento de la lista
+		aux->ant=(*aux2);
+
+	if(auxx)    //Verifica si se cambia con el primer elemento de la lista
+	{
+		auxx->sig=(*aux1);
+	}
+
+	if(!(*aux1)->ant)  //Modifica el puntero a inicio de la lista, en caso de que el primer elemento haya cambiado
+		(*new_f)=(*aux1);
+
+	return;
+}
+
+void bubble_sort(arista **inicio) 
+{
+	if (!(*inicio))
+	{
+		return;
+	}
+	arista *actual,*siguiente;
+	actual=(*inicio);
+	siguiente=(*inicio)->sig;
+	
+	while(siguiente)
+	{
+		if(actual->PAB < siguiente->PAB)
+			swap(&actual,&siguiente,inicio);
+		actual=siguiente;
+	    siguiente=siguiente->sig;
+	}
+	bubble_sort(&(*inicio)->sig);
+	return;
+}
+void ordenamiento(arista **inicio,int n_elem)
+{
+	for(int i=0;i<n_elem;i++)
+	{
+		bubble_sort(inicio);
+	}
+}
+
+////////////////
+
+
+
 
 /**Definición de funciones para dibujar*/
 

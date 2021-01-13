@@ -93,7 +93,7 @@ void asignar_palabra(char *pal,int contador,int opc);
 int start=1,pos_v=0,sv=0,campo=1,posicion=0,leer_archivo=2;;
 char texto_menu_enc[50],nombre_archivo[50];
 char encabezado[100],frase[100],palabra_f[50];
-char palabra1[20],palabra2[20],palabra3[20],palabra4[20],palabra5[20];
+//char palabra1[20],palabra2[20],palabra3[20],palabra4[20],palabra5[20];
 int m; // Total de palabras contenidas en un texto
 p_Cola *Grafo;
 int x=50,y=170;
@@ -102,7 +102,7 @@ int espacio=0;
 int px=-30,py=35,yd=0;
 float radio_v=50.0;
 int pos_pr=0,bnd_pr=0;
-
+frase_c frase_completa[5];
 /**Función Main*/
 int main (int argc, char **argv)
 {
@@ -213,14 +213,13 @@ int crear_arco(vertice *V_d,arista **a)
 	if(!newe)
 		return 0;
 	newe->destino=V_d;
+	newe->peso=1.0;
+	newe->PAB=0.0;
 	if(!(*a))
 		newe->ant=(*a);
 	else
 		(*a)->ant=newe;
-	//newe->ant=NULL;
 	newe->sig=(*a);
-	newe->peso=1.0;
-	newe->PAB=0.0;
 	(*a)=newe;
 	return 1;
 }
@@ -335,7 +334,7 @@ void asignar_costo_aristas(arista *arista_c,float PA_o)
 		if(PA_o==0.0)
 			return;
 		arista_c->PAB=(BnA)/PA_o;
-		printf("PAB:%f\n",arista_c->PAB);
+		//printf("PAB:%f\n",arista_c->PAB);
 		asignar_costo_aristas(arista_c->sig,PA_o);
 	}
 	return;
@@ -382,7 +381,8 @@ void ver_vertices(vertice *vertices)
 {
 	if(vertices)
 	{
-		printf("|%s PA:%f|->",vertices->palabra,vertices->PA);
+		//printf("|%s PA:%f|->",vertices->palabra,vertices->PA);
+		printf("|%s|->",vertices->palabra);
 		ver_arcos(vertices->lista_c);
 		printf("\n");
 		ver_vertices(vertices->enl_sig);
@@ -395,9 +395,15 @@ void ver_arcos(arista *a)
 	if(a)
 	{
 	if(!a->sig)
-	printf("[%s]",a->destino->palabra);
+	{
+		printf("[%s |PAB:%0.5f]",a->destino->palabra,a->PAB);
+		//printf("[%s]",a->destino->palabra);
+	}
 	else
-	printf("[%s]-",a->destino->palabra);
+	{
+		printf("[%s |PAB:%0.5f]-",a->destino->palabra,a->PAB);
+		//printf("[%s]-",a->destino->palabra);
+    }
 	ver_arcos(a->sig);
 }
 	return;
@@ -442,7 +448,7 @@ void eliminar_aristas(arista **A)
 }
 void eliminar_grafo(vertice **G)
 {
-	printf("entra a eliminar_grafo\n");
+	//printf("entra a eliminar_grafo\n");
 	if(!(*G))
 		{
 			FILE *d_file=fopen("Grafo_completo.txt","w");
@@ -503,7 +509,7 @@ void bubble_sort(arista **inicio)
 	
 	while(siguiente)
 	{
-		if(actual->PAB < siguiente->PAB)
+		if(actual->PAB > siguiente->PAB)
 			swap(&actual,&siguiente,inicio);
 		actual=siguiente;
 	    siguiente=siguiente->sig;
@@ -628,7 +634,7 @@ void display_cb() {
 
 	glColor3d(1,1,1); //NavyBlue
 	glRasterPos2f(700.0f,65.0f);
-	sprintf(texto_menu_enc,"Moverse arriba en Menu de funciones -> k");
+	sprintf(texto_menu_enc,"Moverse abajo en Menu de funciones -> k");
 	dibujar_letras(texto_menu_enc,3);
 
 	glColor3d(1,1,1);
@@ -755,6 +761,10 @@ void dibujar_vertices(vertice *V){
 void Menu(int opc){
 	if(sv!=0){
 		posicion=0; campo=1; leer_archivo=2;
+		for(int i=0;i<5;i++)
+		    {
+		    	memset(frase_completa[i].palabra_frase,'\0',strlen(palabra_f)); 
+		    }
 		glutDestroyWindow(sv);
 		sv=0;
 	}
@@ -770,11 +780,10 @@ void Menu(int opc){
 			glutDisplayFunc(display_operaciones_Diksjtra);
 		break;
 		case 3:
-		    memset(palabra1,'\0',strlen(palabra_f)); 
-		    memset(palabra2,'\0',strlen(palabra_f)); 
-		    memset(palabra3,'\0',strlen(palabra_f));
-		    memset(palabra4,'\0',strlen(palabra_f)); 
-		    memset(palabra5,'\0',strlen(palabra_f));
+		    for(int i=0;i<5;i++)
+		    {
+		    	memset(frase_completa[i].palabra_frase,'\0',strlen(palabra_f)); 
+		    }
 		    sv= glutCreateSubWindow(pos_v,0,650,1520,100);
 			glutKeyboardFunc(input_teclado_frases);
 			glutDisplayFunc(display_frases);
@@ -785,7 +794,11 @@ void Menu(int opc){
 			x=50;
 			y=170;
 			posicion=0; campo=1; leer_archivo=2;
-			Grafo->frente=NULL;
+			for(int i=0;i<5;i++)
+		    {
+		    	memset(frase_completa[i].palabra_frase,'\0',strlen(palabra_f)); 
+		    }
+		    Grafo->frente=NULL;
 			Grafo->final=NULL; 
 		break;
 	}
@@ -981,7 +994,6 @@ static void display_frases(void){
 		yd=py;
 		palabras_frecuentes((*buscar_vertice(&Grafo->frente,palabra_f)),0,px);
 	}	
-	
 	glPopMatrix();
 	glutSwapBuffers();
 }
@@ -993,29 +1005,20 @@ void palabras_frecuentes(vertice *raiz, int contador,int xx){
 
 		glColor3d(0.137255,0.137255,0.556863);
 		glRasterPos2f(xx,yd);
-		sprintf(encabezado,"%s",palabra1);
+		sprintf(encabezado,"%s",frase_completa[0].palabra_frase);
 		dibujar_letras(encabezado,3);
 
-		glColor3d(0.137255,0.137255,0.556863);
-		glRasterPos2f(xx+20,yd);
-		sprintf(encabezado,"%s",palabra2);
-		dibujar_letras(encabezado,3);
+		int posx=20;
 
-		glColor3d(0.137255,0.137255,0.556863);
-		glRasterPos2f(xx+40,yd);
-		sprintf(encabezado,"%s",palabra3);
-		dibujar_letras(encabezado,3);
+		for(int i=1;i<5;i++)
+		{
+			glColor3d(0.137255,0.137255,0.556863);
+		    glRasterPos2f(xx+posx,yd);
+		    sprintf(encabezado,"%s",frase_completa[i].palabra_frase);
+		    dibujar_letras(encabezado,3);
 
-		glColor3d(0.137255,0.137255,0.556863);
-		glRasterPos2f(xx+60,yd);
-		sprintf(encabezado,"%s",palabra4);
-		dibujar_letras(encabezado,3);
-
-		glColor3d(0.137255,0.137255,0.556863);
-		glRasterPos2f(xx+80,yd);
-		sprintf(encabezado,"%s",palabra5);
-		dibujar_letras(encabezado,3);
-
+		    posx+=20;
+		}
 		yd-=18;
 		return;
 	}
@@ -1033,27 +1036,9 @@ void p_fre_aristas(arista *raiz,int contador,int xx){
 
 void asignar_palabra(char *pal,int contador,int opc){
 	if(opc){
-		if(contador==0)
-		strcpy(palabra1,pal);
-		if(contador==1)
-		strcpy(palabra2,pal);
-		if(contador==2)
-		strcpy(palabra3,pal);
-		if(contador==3)
-			strcpy(palabra4,pal);
-		if(contador==4)
-			strcpy(palabra5,pal);
+		strcpy(frase_completa[contador].palabra_frase,pal);
 	}else{
-		if(contador==0)
-			memset(palabra1,'\0',strlen(palabra1));
-		if(contador==1)
-			memset(palabra2,'\0',strlen(palabra2));
-		if(contador==2)
-			memset(palabra3,'\0',strlen(palabra3));
-		if(contador==3)
-			memset(palabra4,'\0',strlen(palabra4));
-		if(contador==4)
-			memset(palabra5,'\0',strlen(palabra5));
+		memset(frase_completa[contador].palabra_frase,'\0',strlen(frase_completa[contador].palabra_frase));
 	}
 }
 

@@ -37,7 +37,10 @@ typedef struct Cola
 	vertice *final;
 }p_Cola;
 
-
+typedef struct frase_completa
+{
+	char palabra_frase[25];
+}frase_c;
 
 /**Declaración de funciones para Grafos*/
 vertice *alojar_vertice(char *palabra_a); //Crea espacio en memoria para un vertice del grafo, sin crear conexiones 
@@ -59,7 +62,7 @@ void contar_vertices(vertice *V);
 void calculos(p_Cola **G);
 void eliminar_aristas(arista **A);
 void eliminar_grafo(vertice **G);
-void swap(arista **aux1,arista **aux2,arista **new_f);
+void swap(arista **aux1,arista **aux2,arista **new_f); 
 void bubble_sort(arista **inicio);
 void ordenamiento(vertice **V);
 int count_elem(arista *inicio,int c);//cuenta aristas de un vertice
@@ -599,8 +602,13 @@ void display_cb() {
 	dibujar_letras(texto_menu_enc,3);
 
 	glColor3d(0.0f, 0.1f, 0.1f);
-	glRasterPos2f(600.0f,40.0f);
+	glRasterPos2f(500.0f,40.0f);
 	sprintf(texto_menu_enc,"Palabra");
+	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(1,1,1);
+	glRasterPos2f(700.0f,40.0f);
+	sprintf(texto_menu_enc,"Moverse arriba en Menu de funciones -> i");
 	dibujar_letras(texto_menu_enc,3);
 	
 	glColor3d(1,1,1);
@@ -614,8 +622,13 @@ void display_cb() {
 	dibujar_letras(texto_menu_enc,3);
 
 	glColor3d(0.137255,0.137255,0.556863); //NavyBlue
-	glRasterPos2f(600.0f,65.0f);
+	glRasterPos2f(500.0f,65.0f);
 	sprintf(texto_menu_enc,"Frase");
+	dibujar_letras(texto_menu_enc,3);
+
+	glColor3d(1,1,1); //NavyBlue
+	glRasterPos2f(700.0f,65.0f);
+	sprintf(texto_menu_enc,"Moverse arriba en Menu de funciones -> k");
 	dibujar_letras(texto_menu_enc,3);
 
 	glColor3d(1,1,1);
@@ -931,9 +944,9 @@ void input_teclado_frases(unsigned char c, int x, int y){
 		bnd_pr=1;
 		printf("%s\n",palabra_f);
 	}
-	if(bnd_pr && c=='u')
+	if(bnd_pr && c=='i')
 		py-=10;
-	if(bnd_pr && c=='d')
+	if(bnd_pr && c=='k')
 		py+=10;
 }
 
